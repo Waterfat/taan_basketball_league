@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>賽程 — 大安ㄍㄤㄍㄤ好籃球聯盟</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Anton&family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared-styles.css">
+</head>
+<body>
+
+<nav id="top-nav"></nav>
+<nav class="bottom-nav" id="bottom-nav"></nav>
+
+<div class="wrap">
+  <!-- HERO -->
+  <div class="sched-hero">
+    <div>
+      <div class="eyebrow" style="color:var(--orange2);margin-bottom:.4rem">第 25 屆</div>
+      <h2 style="font-size:1.8rem;margin-bottom:.25rem">例行賽 第 3 週</h2>
+      <div class="sched-meta"><strong>2026 / 2 / 14（六）07:30 · 三重體育館</strong></div>
+    </div>
+  </div>
+
+  <!-- 週次切換 -->
+  <div class="week-nav">
+    <button class="wbtn">← 前一週</button>
+    <div class="wk-lbl">例行賽 第 3 週</div>
+    <button class="wbtn">下一週 →</button>
+  </div>
+
+  <!-- 對戰組合 / 賽程順序 toggle -->
+  <div class="sched-view-toggle">
+    <button id="btn-matchup" class="sched-toggle-btn active-toggle" onclick="showSchedView('matchup')">對戰組合</button>
+    <button id="btn-order"   class="sched-toggle-btn"              onclick="showSchedView('order')">賽程順序</button>
+  </div>
+
+  <!-- ── 對戰組合 view ── -->
+  <div id="view-matchup">
+    <div class="matchup-grid" id="sched-matchup-grid">
+      <!-- 由 page-schedule.js 動態渲染 -->
+    </div>
+    <div style="padding:.4rem .7rem;background:var(--warm1);border-radius:var(--r-sm);font-family:var(--font-cond);font-size:.72rem;color:var(--txt-light)">
+      ℹ️ 對戰組合週初確定 · 賽程順序每週四由管理員公告
+    </div>
+  </div>
+
+  <!-- ── 賽程順序 view ── -->
+  <div id="view-order" style="display:none">
+    <div id="sched-games">
+      <!-- 由 page-schedule.js 動態渲染 -->
+    </div>
+    <div style="margin-top:.6rem;padding:.4rem .7rem;background:var(--warm1);border-radius:var(--r-sm);font-family:var(--font-cond);font-size:.72rem;color:var(--txt-light)">
+      ℹ️ 每場間隔 30 分鐘 · 第一場時間依場地公告為準
+    </div>
+  </div><!-- /view-order -->
+
+</div>
+
+<script src="shared-app.js"></script>
+<script src="js/mock-data.js"></script>
+<script src="js/api.js"></script>
+<script src="js/page-schedule.js"></script>
+<script>document.addEventListener('DOMContentLoaded', loadSchedule);</script>
+</body>
+</html>

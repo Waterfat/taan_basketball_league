@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數據統計 — 大安ㄍㄤㄍㄤ好籃球聯盟</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Anton&family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared-styles.css">
+</head>
+<body>
+
+<nav id="top-nav"></nav>
+<nav class="bottom-nav" id="bottom-nav"></nav>
+
+<div class="wrap">
+  <div class="stats-hero">
+    <h2>數據統計</h2><p id="hero-sub">本季個人排行榜</p>
+  </div>
+
+  <!-- 賽季選擇 -->
+  <div class="season-select-wrap">
+    <select class="season-select" id="season-select" onchange="onSeasonChange(this)"></select>
+  </div>
+
+  <!-- 分類 tabs -->
+  <div class="stat-tabs">
+    <div class="stab active" onclick="switchTab(this,'s-scoring')">得分</div>
+    <div class="stab" onclick="switchTab(this,'s-rebound')">籃板</div>
+    <div class="stab" onclick="switchTab(this,'s-assist')">助攻</div>
+    <div class="stab" onclick="switchTab(this,'s-steal')">抄截</div>
+    <div class="stab" onclick="switchTab(this,'s-block')">阻攻</div>
+    <div class="stab" onclick="switchTab(this,'s-eff')">EFF</div>
+  </div>
+
+  <!-- Stats content (panels — preserved as template, replaced during loading) -->
+  <div id="stats-content">
+    <!-- 得分 -->
+    <div id="s-scoring">
+      <div class="podium" id="pod-scoring"></div>
+      <div class="card" style="overflow-x:auto">
+        <table class="stat-table">
+          <thead><tr><th>#</th><th>球員</th><th>隊伍</th><th>場均得分</th><th>2P%</th><th>3P%</th><th>FT%</th></tr></thead>
+          <tbody id="tb-scoring"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- 籃板 -->
+    <div id="s-rebound" style="display:none">
+      <div class="podium" id="pod-rebound"></div>
+      <div class="card" style="overflow-x:auto">
+        <table class="stat-table">
+          <thead><tr><th>#</th><th>球員</th><th>隊伍</th><th>場均籃板</th><th>進攻</th><th>防守</th></tr></thead>
+          <tbody id="tb-rebound"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- 助攻 -->
+    <div id="s-assist" style="display:none">
+      <div class="podium" id="pod-assist"></div>
+      <div class="card" style="overflow-x:auto">
+        <table class="stat-table">
+          <thead><tr><th>#</th><th>球員</th><th>隊伍</th><th>場均助攻</th></tr></thead>
+          <tbody id="tb-assist"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- 抄截 -->
+    <div id="s-steal" style="display:none">
+      <div class="podium" id="pod-steal"></div>
+      <div class="card" style="overflow-x:auto">
+        <table class="stat-table">
+          <thead><tr><th>#</th><th>球員</th><th>隊伍</th><th>場均抄截</th></tr></thead>
+          <tbody id="tb-steal"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- 阻攻 -->
+    <div id="s-block" style="display:none">
+      <div class="podium" id="pod-block"></div>
+      <div class="card" style="overflow-x:auto">
+        <table class="stat-table">
+          <thead><tr><th>#</th><th>球員</th><th>隊伍</th><th>場均阻攻</th></tr></thead>
+          <tbody id="tb-block"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- EFF -->
+    <div id="s-eff" style="display:none">
+      <div class="podium" id="pod-eff"></div>
+      <div class="card" style="overflow-x:auto">
+        <table class="stat-table">
+          <thead><tr><th>#</th><th>球員</th><th>隊伍</th><th>EFF</th></tr></thead>
+          <tbody id="tb-eff"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="shared-app.js"></script>
+<script src="js/mock-data.js"></script>
+<script src="js/api.js"></script>
+<script src="js/page-stats.js"></script>
+</body>
+</html>
