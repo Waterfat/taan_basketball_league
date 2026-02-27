@@ -120,6 +120,26 @@
     });
   }
 
+  /* ── 動態生成 filter chips ── */
+  function buildFilterChips() {
+    const container = document.getElementById('team-filter');
+    if (!container) return;
+    const teamOrder = ['紅', '黑', '藍', '綠', '黃', '白'];
+    let html = '<div class="tf-chip active" data-team="all" style="border-color:var(--orange);color:var(--orange)">全部隊伍</div>';
+    teamOrder.forEach(name => {
+      const cfg = TEAM_CONFIG[name] || {};
+      const dotColor = cfg.barColor || cfg.color || '';
+      html += `<div class="tf-chip" data-team="${cfg.id}" style="--tc:${cfg.color}"><span class="tf-dot" style="background:${dotColor}"></span>${name}隊</div>`;
+    });
+    container.innerHTML = html;
+    // 事件委派
+    container.addEventListener('click', (e) => {
+      const chip = e.target.closest('.tf-chip');
+      if (!chip) return;
+      filterTeam(chip, chip.dataset.team);
+    });
+  }
+
   /* ── Team filter ── */
   function filterTeam(el, teamId) {
     document.querySelectorAll('.tf-chip').forEach(c => {
@@ -147,6 +167,7 @@
 
   /* ── Fetch & Init ── */
   async function loadRoster() {
+    buildFilterChips();
     const container = document.getElementById('roster-list');
     showLoading(container);
 
@@ -161,9 +182,8 @@
     }
   }
 
-  // 暴露全域（供 HTML onclick 和 retry 呼叫）
+  // 暴露全域（供 retry 按鈕呼叫）
   window.loadRoster = loadRoster;
-  window.filterTeam = filterTeam;
 
   document.addEventListener('DOMContentLoaded', loadRoster);
 })();

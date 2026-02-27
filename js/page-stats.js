@@ -98,12 +98,27 @@
     }
   }
 
-  // 暴露全域
+  // 暴露全域（供 retry 呼叫）
   window.loadStats = loadStats;
-  window.onSeasonChange = onSeasonChange;
 
   document.addEventListener('DOMContentLoaded', () => {
     _statsPanelsHtml = document.getElementById('stats-content').innerHTML;
+
+    // Stats tab 事件綁定
+    const tabsContainer = document.getElementById('stat-tabs');
+    if (tabsContainer) {
+      tabsContainer.addEventListener('click', (e) => {
+        const tab = e.target.closest('.stab');
+        if (!tab) return;
+        const panelId = tab.dataset.panel;
+        if (panelId) switchTab(tab, panelId);
+      });
+    }
+
+    // Season selector 事件綁定
+    const sel = document.getElementById('season-select');
+    if (sel) sel.addEventListener('change', () => onSeasonChange(sel));
+
     loadStats();
   });
 })();

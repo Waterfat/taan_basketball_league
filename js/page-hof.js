@@ -95,10 +95,10 @@
 
     container.innerHTML = `
       <div class="hof-tabs">
-        <div class="htab active" onclick="switchHof(this,'h-avg')">場均數據</div>
-        <div class="htab" onclick="switchHof(this,'h-total')">生涯累計</div>
-        <div class="htab" onclick="switchHof(this,'h-iron')">鐵人榜</div>
-        <div class="htab" onclick="switchHof(this,'h-champ')">奪冠榜</div>
+        <div class="htab active" data-panel="h-avg">場均數據</div>
+        <div class="htab" data-panel="h-total">生涯累計</div>
+        <div class="htab" data-panel="h-iron">鐵人榜</div>
+        <div class="htab" data-panel="h-champ">奪冠榜</div>
       </div>
       <div id="h-avg">${renderAvg(data.avgStats)}</div>
       <div id="h-total" style="display:none">${renderTotal(data.totalStats)}</div>
@@ -109,6 +109,14 @@
     if (data.avgStats.podium.top3 && data.avgStats.podium.top3.length >= 3) {
       renderPodium('hof-pod-avg', data.avgStats.podium.top3, data.avgStats.podium.unit);
     }
+
+    // HoF tab 事件委派
+    container.addEventListener('click', (e) => {
+      const tab = e.target.closest('.htab');
+      if (!tab) return;
+      const panelId = tab.dataset.panel;
+      if (panelId) switchHof(tab, panelId);
+    });
   }
 
   /* ── Fetch & Init ── */

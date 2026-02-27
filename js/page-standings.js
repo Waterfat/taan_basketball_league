@@ -12,22 +12,19 @@
   function renderRankTable(teams) {
     const rows = teams.map(t => {
       const tc = TEAM_CONFIG[t.team] || {};
-      const pctCls = parseFloat(t.pct) >= 60 ? ' class="pct-g"' : (parseFloat(t.pct) < 30 ? ' class="pct-b"' : '');
+      const pctCls = getPctClass(t.pct);
+      const pctAttr = pctCls ? ` class="${pctCls}"` : '';
       const badgeCls = t.streakType === 'win' ? 'bw' : 'bl';
       // "2連勝" → "2勝"
       const streakShort = (t.streak || '').replace('連', '');
 
       // 近況 W/L dots
-      const histHtml = (t.history || []).map((h, i) => {
-        const isLast = i === t.history.length - 1;
-        const cls = h === 'W' ? 'wl-dot wl-w' : 'wl-dot wl-l';
-        return `<span class="${cls}${isLast ? ' wl-latest' : ''}">${h === 'W' ? '○' : '✕'}</span>`;
-      }).join('');
+      const histHtml = renderHistoryDots(t.history || []);
 
       return `<tr class="st-row-main">
         <td><div class="st-team"><span class="st-rank">${t.rank}</span><span class="dot ${tc.dot}"></span><span class="${tc.cls}">${t.name}</span></div></td>
         <td>${t.wins}</td><td>${t.losses}</td>
-        <td${pctCls}>${t.pct}</td>
+        <td${pctAttr}>${t.pct}</td>
         <td class="st-hist-cell"><div class="st-hist">${histHtml}</div></td>
         <td><span class="badge ${badgeCls}">${streakShort}</span></td>
       </tr>

@@ -19,17 +19,17 @@
 
   <!-- 賽季選擇 -->
   <div class="season-select-wrap">
-    <select class="season-select" id="season-select" onchange="onSeasonChange(this)"></select>
+    <select class="season-select" id="season-select"></select>
   </div>
 
   <!-- 分類 tabs -->
-  <div class="stat-tabs">
-    <div class="stab active" onclick="switchTab(this,'s-scoring')">得分</div>
-    <div class="stab" onclick="switchTab(this,'s-rebound')">籃板</div>
-    <div class="stab" onclick="switchTab(this,'s-assist')">助攻</div>
-    <div class="stab" onclick="switchTab(this,'s-steal')">抄截</div>
-    <div class="stab" onclick="switchTab(this,'s-block')">阻攻</div>
-    <div class="stab" onclick="switchTab(this,'s-eff')">EFF</div>
+  <div class="stat-tabs" id="stat-tabs">
+    <div class="stab active" data-panel="s-scoring">得分</div>
+    <div class="stab" data-panel="s-rebound">籃板</div>
+    <div class="stab" data-panel="s-assist">助攻</div>
+    <div class="stab" data-panel="s-steal">抄截</div>
+    <div class="stab" data-panel="s-block">阻攻</div>
+    <div class="stab" data-panel="s-eff">EFF</div>
   </div>
 
   <!-- Stats content (panels — preserved as template, replaced during loading) -->

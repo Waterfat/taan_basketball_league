@@ -45,6 +45,9 @@ const ApiConfig = {
     home:      { file: 'home.json',      sheets: true  },
   },
 
+  /** 當前賽季屆數 */
+  currentSeason: 25,
+
   /** 請求超時（ms） */
   timeout: 15000,
 
@@ -200,21 +203,18 @@ async function fetchStatic(endpoint) {
    TRANSFORMER — Google Sheets → 前端 JSON
    ═══════════════════════════════════════ */
 
-/** 解析 "姓名(隊色" → { name, team } */
+/** 解析 "姓名(隊色)" 或 "姓名(隊色" → { name, team } */
 function parseSheetsName(raw) {
   if (!raw) return { name: '', team: '' };
-  const idx = raw.lastIndexOf('(');
-  if (idx === -1) return { name: raw, team: '' };
-  return {
-    name: raw.substring(0, idx),
-    team: raw.substring(idx + 1).replace(')', ''),
-  };
+  const m = raw.match(/^(.+)\(([^()]+)\)?$/);
+  if (!m) return { name: raw, team: '' };
+  return { name: m[1], team: m[2] };
 }
 
 /** 從 homeRows 第一欄提取 meta 資訊 */
 function extractMeta(homeRows) {
   return {
-    season: 25,
+    season: ApiConfig.currentSeason,
     phase: (homeRows[0] && homeRows[0][0]) || '例行賽',
     week: parseInt((homeRows[1] && homeRows[1][0]) || '0') || 0,
     date: (homeRows[3] && homeRows[3][0]) || '',
@@ -358,7 +358,7 @@ function transformDragon(dragonRows) {
   });
 
   return {
-    season: 25,
+    season: ApiConfig.currentSeason,
     phase: '賽季進行中',
     civilianThreshold: 36,
     columns: ['出席', '輪值', '拖地', '季後賽'],
@@ -590,7 +590,7 @@ function transformAllSchedule(schedRows, rotationRows, comboRows) {
     weeks[String(e.week)] = e;
   });
 
-  return { season: 25, currentWeek, allWeeks, weeks };
+  return { season: ApiConfig.currentSeason, currentWeek, allWeeks, weeks };
 }
 
 /* ── 轉換：賽程（舊版，供 home 使用） ── */
@@ -799,8 +799,8 @@ const api = {
     if (cached) return cached;
 
     try {
-      const batch = await fetchSheetsBatch(['home', 'standings', 'dragon', 'allSchedule', 'allRotation', 'allMatchups']);
-      const schedData = transformAllSchedule(batch.allSchedule, batch.allRotation || [], batch.allMatchups || []);
+      const batch = await fetchSheetsBatch(['home', 'standings', 'dragon', 'allSchedule', 'allMatchups']);
+      const schedData = transformAllSchedule(batch.allSchedule, [], batch.allMatchups || []);
       const data = transformHome(batch.home, batch.standings, batch.dragon, schedData.allWeeks);
       setCache('ep:home', data);
       return data;

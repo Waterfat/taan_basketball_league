@@ -154,10 +154,10 @@ function genericTabSwitch(clickedEl, tabClass, panelIds, activeCls, targetId, sc
   if (target) target.style.display = 'block';
 }
 
-/* ── Schedule toggle (home page) ── */
-function showSched(mode) {
-  const matchup = document.getElementById('sched-matchup');
-  const order = document.getElementById('sched-order');
+/* ── Schedule toggle (通用：首頁 & 賽程頁共用) ── */
+function toggleSchedView(mode, matchupId, orderId) {
+  const matchup = document.getElementById(matchupId);
+  const order = document.getElementById(orderId);
   const btnM = document.getElementById('btn-matchup');
   const btnO = document.getElementById('btn-order');
   if (matchup) matchup.style.display = mode === 'matchup' ? 'block' : 'none';
@@ -165,6 +165,7 @@ function showSched(mode) {
   if (btnM) btnM.classList.toggle('active-toggle', mode === 'matchup');
   if (btnO) btnO.classList.toggle('active-toggle', mode === 'order');
 }
+function showSched(mode) { toggleSchedView(mode, 'sched-matchup', 'sched-order'); }
 
 /* ── Mini stat tabs (home page) ── */
 function switchMS(el, id) {
@@ -188,20 +189,36 @@ function switchHof(el, id) {
 }
 
 /* ── Schedule page: matchup / order view toggle ── */
-function showSchedView(mode) {
-  const matchup = document.getElementById('view-matchup');
-  const order = document.getElementById('view-order');
-  const btnM = document.getElementById('btn-matchup');
-  const btnO = document.getElementById('btn-order');
-  if (matchup) matchup.style.display = mode === 'matchup' ? 'block' : 'none';
-  if (order) order.style.display = mode === 'order' ? 'block' : 'none';
-  if (btnM) btnM.classList.toggle('active-toggle', mode === 'matchup');
-  if (btnO) btnO.classList.toggle('active-toggle', mode === 'order');
-}
+function showSchedView(mode) { toggleSchedView(mode, 'view-matchup', 'view-order'); }
 
 /* ══════════════════════════════════════
    共用：隊伍色 HTML 輔助函式
    ══════════════════════════════════════ */
+
+/** W/L dots 渲染（首頁 & 戰績榜共用） */
+function renderHistoryDots(history) {
+  if (!history || !history.length) return '';
+  return history.map((h, i) => {
+    const isLast = i === history.length - 1;
+    const cls = h === 'W' ? 'wl-dot wl-w' : 'wl-dot wl-l';
+    return `<span class="${cls}${isLast ? ' wl-latest' : ''}">${h === 'W' ? '○' : '✕'}</span>`;
+  }).join('');
+}
+
+/** 取得隊伍背景色（可自訂 alpha） */
+function getTeamBg(teamName, alpha) {
+  const tc = TEAM_CONFIG[teamName] || {};
+  if (!tc.bg) return '';
+  return tc.bg.replace(/[\d.]+\)$/, `${alpha})`);
+}
+
+/** 勝率顏色 class：>=60% 綠、<30% 紅 */
+function getPctClass(pctStr) {
+  const val = parseFloat(pctStr);
+  if (val >= 60) return 'pct-g';
+  if (val < 30) return 'pct-b';
+  return '';
+}
 
 function teamTdHtml(teamName) {
   const t = TEAM_CONFIG[teamName] || {};

@@ -16,8 +16,7 @@
     const tagHtml = p.tag
       ? ` <span style="font-family:var(--font-cond);font-size:.68rem;font-weight:800;color:var(--orange);letter-spacing:.02em">(${p.tag})</span>`
       : '';
-    const bgAlpha = isTop3 ? '.16' : '.10';
-    const bg = tc.bg ? tc.bg.replace(/[\d.]+\)$/, `${bgAlpha})`) : '';
+    const bg = getTeamBg(p.team, isTop3 ? '.16' : '.10');
 
     return `<tr style="background:${bg}">
       <td><span class="${rankCls}">${p.rank}</span></td>
