@@ -72,11 +72,15 @@
           <div class="tb-count">${totalPlayers} 名球員</div>
           <div class="tb-pct" style="color:${pctColor}">${teamPct}%</div>
         </div>
-        <div class="att-wrap">
-          <table class="att-table">
-            <colgroup><col class="col-name">${_weeks.map(() => '<col>').join('')}<col class="col-sum"></colgroup>
-            ${thead}${tbody}
-          </table>
+        <div class="att-scroll-wrap">
+          <div class="att-scroll-arrow left">◀</div>
+          <div class="att-scroll-arrow right">▶</div>
+          <div class="att-wrap">
+            <table class="att-table">
+              <colgroup><col class="col-name">${_weeks.map(() => '<col>').join('')}<col class="col-sum"></colgroup>
+              ${thead}${tbody}
+            </table>
+          </div>
         </div>
       </div>`;
   }
@@ -93,6 +97,27 @@
       html += buildTeamBlock(team);
     });
     container.innerHTML = html;
+    initScrollArrows();
+  }
+
+  /* ── Scroll arrows for att-wrap ── */
+  function initScrollArrows() {
+    document.querySelectorAll('.att-scroll-wrap').forEach(wrap => {
+      const scroller = wrap.querySelector('.att-wrap');
+      const arrowL = wrap.querySelector('.att-scroll-arrow.left');
+      const arrowR = wrap.querySelector('.att-scroll-arrow.right');
+      if (!scroller || !arrowL || !arrowR) return;
+
+      function update() {
+        const canScrollLeft = scroller.scrollLeft > 2;
+        const canScrollRight = scroller.scrollLeft < scroller.scrollWidth - scroller.clientWidth - 2;
+        arrowL.classList.toggle('visible', canScrollLeft);
+        arrowR.classList.toggle('visible', canScrollRight);
+      }
+      scroller.addEventListener('scroll', update, { passive: true });
+      // initial check after layout
+      requestAnimationFrame(() => { update(); requestAnimationFrame(update); });
+    });
   }
 
   /* ── Team filter ── */

@@ -238,8 +238,17 @@ body { padding-bottom: 64px; }
 .st-rank.r1{color:#e6b800} .st-rank.r2{color:#78909c} .st-rank.r3{color:#a1887f}
 .pct-g { color:var(--green); font-weight:800; }
 .pct-b { color:var(--red); font-weight:800; }
-.st-hist { display:flex; align-items:center; gap:2px; justify-content:center; flex-wrap:wrap; }
+.st-hist { display:flex; align-items:center; gap:2px; justify-content:center; flex-wrap:nowrap; }
 .st-hist .wl-dot { width:16px; height:16px; font-size:.5rem; border-radius:3px; }
+/* 手機版：近況列隱藏桌面欄，改為隊伍下方獨立列 */
+.st-row-hist-mobile { display:none; }
+@media (max-width: 600px) {
+  .st-hist-cell { display:none !important; }
+  .st-row-hist-mobile { display:table-row; }
+  .st-row-hist-mobile td { padding:.1rem .9rem .65rem; border-bottom:1px solid var(--warm1); }
+  .st-row-hist-mobile .st-hist { justify-content:flex-start; gap:3px; }
+  .st-row-main td { border-bottom:none; }
+}
 
 /* progress track */
 .prog-track { background:var(--warm2); border-radius:99px; height:6px; overflow:hidden; margin-top:.5rem; }
@@ -521,12 +530,14 @@ body { padding-bottom: 64px; }
 
 .matrix { width:100%; border-collapse:collapse; font-size:.78rem; }
 .matrix th,.matrix td { padding:.5rem .55rem; text-align:center; border:1px solid var(--warm2); font-family:var(--font-cond); }
-.matrix th { background:var(--warm1); color:var(--txt-light); font-size:.62rem; font-weight:800; letter-spacing:.08em; }
-.matrix td.pos { color:var(--green); font-weight:800; }
-.matrix td.neg { color:var(--red); font-weight:800; }
+.matrix th { background:var(--warm1); font-size:.72rem; font-weight:800; letter-spacing:.08em; }
 .matrix td.self { background:var(--warm2); color:var(--txt-light); }
 .matrix td.tg { color:var(--green); font-weight:900; font-family:var(--font-disp); font-size:.9rem; }
 .matrix td.tb { color:var(--red); font-weight:900; font-family:var(--font-disp); font-size:.9rem; }
+@media (max-width: 600px) {
+  .matrix th,.matrix td { padding:.4rem .3rem; font-size:.72rem; }
+  .matrix td.tg,.matrix td.tb { font-size:.78rem; }
+}
 
 /* ═══════════════════════════════════
    DRAGON TIGER PAGE STYLES
@@ -828,6 +839,19 @@ body { padding-bottom: 64px; }
 .att-table tbody tr:hover { background: var(--warm1) !important; }
 .wk-group { background: var(--navy3) !important; color: rgba(255,255,255,.6) !important; letter-spacing: .08em; }
 .wk-group-span { font-family: var(--font-cond); font-size: .6rem; color: rgba(255,255,255,.4); font-weight: 700; }
+/* roster scroll arrows */
+.att-scroll-wrap { position:relative; }
+.att-scroll-arrow {
+  position:absolute; top:50%; transform:translateY(-50%); z-index:5;
+  width:22px; height:44px; display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.85); border:1px solid var(--warm2); border-radius:6px;
+  font-size:.7rem; color:var(--txt-light); pointer-events:none;
+  opacity:0; transition:opacity .25s;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+}
+.att-scroll-arrow.left  { left:110px; }
+.att-scroll-arrow.right { right:0; }
+.att-scroll-arrow.visible { opacity:1; }
 @media (max-width: 600px) {
   .roster-hero { padding: 1.3rem 1.2rem; }
   .roster-hero h2 { font-size: 1.9rem; }

@@ -10,7 +10,7 @@
 
   /* ── 渲染排名總表 ── */
   function renderRankTable(teams) {
-    const tbody = teams.map(t => {
+    const rows = teams.map(t => {
       const tc = TEAM_CONFIG[t.team] || {};
       const pctCls = parseFloat(t.pct) >= 60 ? ' class="pct-g"' : (parseFloat(t.pct) < 30 ? ' class="pct-b"' : '');
       const badgeCls = t.streakType === 'win' ? 'bw' : 'bl';
@@ -22,25 +22,31 @@
         return `<span class="${cls}${isLast ? ' wl-latest' : ''}">${h === 'W' ? '○' : '✕'}</span>`;
       }).join('');
 
-      return `<tr>
+      return `<tr class="st-row-main">
         <td><div class="st-team"><span class="st-rank">${t.rank}</span><span class="dot ${tc.dot}"></span><span class="${tc.cls}">${t.name}</span></div></td>
         <td>${t.wins}</td><td>${t.losses}</td>
         <td${pctCls}>${t.pct}</td>
-        <td><div class="st-hist">${histHtml}</div></td>
+        <td class="st-hist-cell"><div class="st-hist">${histHtml}</div></td>
         <td><span class="badge ${badgeCls}">${t.streak}</span></td>
+      </tr>
+      <tr class="st-row-hist-mobile">
+        <td colspan="6"><div class="st-hist">${histHtml}</div></td>
       </tr>`;
     }).join('');
 
     return `<table class="st-table">
-      <thead><tr><th>名次</th><th>勝</th><th>敗</th><th>勝率</th><th>近況</th><th>連</th></tr></thead>
-      <tbody>${tbody}</tbody>
+      <thead><tr><th>名次</th><th>勝</th><th>敗</th><th>勝率</th><th class="st-hist-cell">近況</th><th>連</th></tr></thead>
+      <tbody>${rows}</tbody>
     </table>`;
   }
 
   /* ── 渲染對戰矩陣 ── */
   function renderMatrix(matrix) {
     const { teams, results } = matrix;
-    const thead = '<tr><th></th>' + teams.map(t => `<th>${t}</th>`).join('') + '</tr>';
+    const thead = '<tr><th></th>' + teams.map(t => {
+      const tc = TEAM_CONFIG[t] || {};
+      return `<th class="${tc.cls || ''}">${t}</th>`;
+    }).join('') + '</tr>';
     const tbody = teams.map((t, ri) => {
       const tc = TEAM_CONFIG[t] || {};
       const cells = results[ri].map((val, ci) => {
@@ -52,7 +58,7 @@
       return `<tr><td class="fw7 ${tc.cls}">${t}</td>${cells}</tr>`;
     }).join('');
 
-    return `<table class="matrix" style="min-width:380px">
+    return `<table class="matrix">
       <thead>${thead}</thead>
       <tbody>${tbody}</tbody>
     </table>`;
