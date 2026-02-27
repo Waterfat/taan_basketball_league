@@ -249,6 +249,8 @@ body { padding-bottom: 64px; }
   .st-row-hist-mobile .st-hist { justify-content:flex-start; gap:3px; }
   .st-row-main td { border-bottom:none; }
 }
+.st-hist-label { display:none; font-family:var(--font-cond); font-size:.6rem; font-weight:800; color:var(--txt-light); letter-spacing:.06em; margin-right:4px; }
+@media (max-width: 600px) { .st-hist-label { display:inline; } }
 
 /* progress track */
 .prog-track { background:var(--warm2); border-radius:99px; height:6px; overflow:hidden; margin-top:.5rem; }

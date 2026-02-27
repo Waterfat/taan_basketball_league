@@ -305,19 +305,6 @@ document.addEventListener('click', function(e) {
   if (el) playBtnClick();
 }, true);
 
-/* ── 背景音樂（循環播放） ── */
-const _bgm = new Audio('assets/bgm_lobby.mp3');
-_bgm.loop = true;
-_bgm.volume = 0.3;
-
-function tryPlayBgm() {
-  if (_bgm.paused) _bgm.play().catch(() => {});
-}
-
-// 瀏覽器需要使用者互動才能播放音訊，監聽首次互動後開始
-document.addEventListener('click', tryPlayBgm, { once: true });
-document.addEventListener('touchstart', tryPlayBgm, { once: true });
-document.addEventListener('keydown', tryPlayBgm, { once: true });
 
 /* ── Init on DOM ready ── */
 document.addEventListener('DOMContentLoaded', initNavigation);

@@ -43,7 +43,7 @@
       return `
         <div class="hgc hgc-upcoming">
           <span class="hgc-num">GAME ${game.num}</span>
-          <div class="hgc-pending">即將開打</div>
+          <div class="hgc-pending">尚未安排</div>
         </div>`;
     }
 
@@ -113,7 +113,7 @@
           <div class="gc-head">
             <div class="gc-stripe"></div>
             <div class="gc-num">GAME ${game.num}</div>
-            <div class="gc-teams" style="color:var(--txt-light)">即將開打</div>
+            <div class="gc-teams" style="color:var(--txt-light)">尚未安排</div>
           </div>
         </div>`;
     }
