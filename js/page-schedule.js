@@ -1,16 +1,21 @@
 /* ══════════════════════════════════
-   PAGE: SCHEDULE — 賽程
-   依賴：shared-app.js (TEAM_CONFIG, showLoading, showError, showEmpty, toggleCard)
+   PAGE: SCHEDULE — 賽程（含週次導航）
+   依賴：shared-app.js (TEAM_CONFIG, showLoading, showError, showEmpty, toggleCard, showSchedView)
    依賴：js/api.js (api.getSchedule)
-   資料：data/schedule.json
+   資料：datas!D87:N113 + datas!Q88:AC177
 ══════════════════════════════════ */
 
 (function() {
   'use strict';
 
   let _schedule = null;
+  let _viewIndex = -1;
+  // Expose effective home entry globally for cross-module coordination
+  window._effectiveHomeEntry = null;
 
-  /* ── Status helpers ── */
+  /* ═══════════════════════════════
+     Status helpers
+     ═══════════════════════════════ */
   function gameStatusBadge(game) {
     if (game.status === 'finished') {
       const winner = game.homeScore > game.awayScore ? game.home : game.away;
@@ -29,8 +34,19 @@
     return '';
   }
 
-  /* ── Build home page game cards (compact) ── */
+  /* ═══════════════════════════════
+     Home page cards (unchanged)
+     ═══════════════════════════════ */
   function buildHomeGameCard(game) {
+    // 賽程順序尚未排定 → 簡化顯示
+    if (!game.home && !game.away) {
+      return `
+        <div class="hgc hgc-upcoming">
+          <span class="hgc-num">GAME ${game.num}</span>
+          <div class="hgc-pending">即將開打</div>
+        </div>`;
+    }
+
     const hc = TEAM_CONFIG[game.home] || {};
     const ac = TEAM_CONFIG[game.away] || {};
     const isUpcoming = game.status === 'upcoming';
@@ -44,7 +60,7 @@
 
     return `
       <div class="hgc${isUpcoming ? ' hgc-upcoming' : ''}">
-        <span class="hgc-num">GAME ${game.num}&nbsp;·&nbsp;${game.time}</span>
+        <span class="hgc-num">GAME ${game.num}${game.time ? '&nbsp;·&nbsp;' + game.time : ''}</span>
         <div class="hgc-matchup">
           <span class="hgc-team ${hc.cls}">${game.home}隊</span>
           <span class="hgc-vs">VS</span>
@@ -54,7 +70,6 @@
       </div>`;
   }
 
-  /* ── Build home page matchup cards ── */
   function buildHomeMatchupCard(m) {
     const hc = TEAM_CONFIG[m.home] || {};
     const ac = TEAM_CONFIG[m.away] || {};
@@ -69,7 +84,6 @@
       </div>`;
   }
 
-  /* ── Render home page schedule section (if containers exist) ── */
   function renderHomeSchedule(weekData) {
     const matchupGrid = document.getElementById('home-matchup-grid');
     const orderGrid = document.getElementById('home-order-grid');
@@ -79,19 +93,40 @@
     }
     if (orderGrid && weekData.games) {
       orderGrid.innerHTML = weekData.games.map(buildHomeGameCard).join('');
-      // 加入提示文字
       const hint = document.getElementById('home-order-hint');
       if (hint) hint.style.display = 'block';
     }
+
+    // 有賽程順序（且已排定隊伍）時預設顯示賽程順序，否則顯示對戰組合
+    const hasGames = weekData.games && weekData.games.length > 0 && weekData.games[0].home;
+    showSched(hasGames ? 'order' : 'matchup');
   }
 
-  /* ── Build schedule page game card (expandable) ── */
-  function buildSchedGameCard(game, isFirst) {
+  /* ═══════════════════════════════
+     Schedule page — game cards
+     ═══════════════════════════════ */
+  function buildSchedGameCard(game) {
+    // 賽程順序尚未排定 → 簡化顯示
+    if (!game.home && !game.away) {
+      return `
+        <div class="game-card">
+          <div class="gc-head">
+            <div class="gc-stripe"></div>
+            <div class="gc-num">GAME ${game.num}</div>
+            <div class="gc-teams" style="color:var(--txt-light)">即將開打</div>
+          </div>
+        </div>`;
+    }
+
     const hc = TEAM_CONFIG[game.home] || {};
     const ac = TEAM_CONFIG[game.away] || {};
 
+    const isFinished = game.status === 'finished' || game.status === 'live';
+    const homeWin = isFinished && game.homeScore > game.awayScore;
+    const awayWin = isFinished && game.awayScore > game.homeScore;
+
     let scoreSection;
-    if (game.status === 'finished' || game.status === 'live') {
+    if (isFinished) {
       scoreSection = `<div class="gc-score">${gameScoreHtml(game)}</div>`;
     } else {
       scoreSection = '<div class="gc-score pending">尚未開打</div>';
@@ -99,20 +134,29 @@
 
     let staffHtml = '';
     if (game.staff && Object.keys(game.staff).length) {
-      staffHtml = Object.entries(game.staff).map(([role, people]) =>
-        `<div class="gc-staff"><span class="gc-role">${role}</span><span class="gc-name">${people.join('・')}</span></div>`
-      ).join('');
+      staffHtml = Object.entries(game.staff).map(([role, people]) => {
+        const coloredNames = people.map(p => {
+          const m = p.match(/\(([^)]+)\)$/);
+          if (m) {
+            const tc = TEAM_CONFIG[m[1]] || {};
+            return `<span class="${tc.cls || ''}">${p}</span>`;
+          }
+          return p;
+        }).join('<span class="gc-name-sep">・</span>');
+        return `<div class="gc-staff"><span class="gc-role">${role}</span><span class="gc-name">${coloredNames}</span></div>`;
+      }).join('');
     }
 
+    // 有比分(finished) → 全部收合；沒比分(upcoming) → 全部展開
     return `
-      <div class="game-card${isFirst ? ' open' : ''}" onclick="toggleCard(this)">
+      <div class="game-card${!isFinished ? ' open' : ''}" onclick="toggleCard(this)">
         <div class="gc-head">
           <div class="gc-stripe"></div>
-          <div class="gc-num">GAME ${game.num} · ${game.time}</div>
+          <div class="gc-num">GAME ${game.num}${game.time ? ' · ' + game.time : ''}</div>
           <div class="gc-teams">
-            <span class="dot ${hc.dot}"></span><span class="${hc.cls}">${game.home}</span>
+            ${homeWin ? '<span class="gc-win">👑</span>' : ''}<span class="dot ${hc.dot}"></span><span class="${hc.cls}">${game.home}</span>
             <span class="gc-sep">VS</span>
-            <span class="dot ${ac.dot}"></span><span class="${ac.cls}">${game.away}</span>
+            ${awayWin ? '<span class="gc-win">👑</span>' : ''}<span class="dot ${ac.dot}"></span><span class="${ac.cls}">${game.away}</span>
           </div>
           ${scoreSection}
           <div class="gc-arr">▼</div>
@@ -121,7 +165,47 @@
       </div>`;
   }
 
-  /* ── Render full schedule page ── */
+  /* ═══════════════════════════════
+     Schedule page — matchup cards with results
+     ═══════════════════════════════ */
+  function buildMatchupResultCard(m) {
+    const hc = TEAM_CONFIG[m.home] || {};
+    const ac = TEAM_CONFIG[m.away] || {};
+    const hasTeams = m.home && m.away;
+
+    let scoreHtml;
+    if (m.status === 'finished') {
+      const winner = m.homeScore > m.awayScore ? m.home : m.away;
+      scoreHtml = `
+        <div class="hgc-score-row">
+          <span class="hgc-s ${hc.cls}">${m.homeScore}</span>
+          <span class="hgc-colon">:</span>
+          <span class="hgc-s ${ac.cls}">${m.awayScore}</span>
+        </div>
+        <span class="badge bw" style="font-size:.62rem">${winner}隊勝</span>`;
+    } else {
+      scoreHtml = '<div class="hgc-pending">尚未開打</div>';
+    }
+
+    if (!hasTeams) {
+      scoreHtml = '<div class="hgc-pending" style="color:var(--txt-light)">尚未公告</div>';
+    }
+
+    return `
+      <div class="hgc${m.status === 'upcoming' ? ' hgc-upcoming' : ''}">
+        <span class="hgc-num">組合 ${m.combo}</span>
+        <div class="hgc-matchup">
+          <span class="hgc-team ${hc.cls}">${hasTeams ? m.home + '隊' : '—'}</span>
+          <span class="hgc-vs">VS</span>
+          <span class="hgc-team ${ac.cls}">${hasTeams ? m.away + '隊' : '—'}</span>
+        </div>
+        ${scoreHtml}
+      </div>`;
+  }
+
+  /* ═══════════════════════════════
+     Schedule page — render functions
+     ═══════════════════════════════ */
   function renderSchedulePage(weekData) {
     const container = document.getElementById('sched-games');
     if (!container) return;
@@ -129,39 +213,227 @@
       showEmpty(container, '本週尚無賽程資料');
       return;
     }
-    container.innerHTML = weekData.games.map((g, i) => buildSchedGameCard(g, i === 0)).join('');
+    container.innerHTML = weekData.games.map(g => buildSchedGameCard(g)).join('');
   }
 
-  /* ── Render schedule page matchups ── */
   function renderScheduleMatchups(weekData) {
     const container = document.getElementById('sched-matchup-grid');
-    if (!container || !weekData.matchups) return;
+    if (!container) return;
 
-    const hc = (t) => TEAM_CONFIG[t] || {};
-    container.innerHTML = weekData.matchups.map(m =>
-      `<div class="mup-card"><div class="mup-num">組合 ${m.combo}</div><div class="mup-matchup"><span class="${hc(m.home).cls}">${m.home}隊</span><span class="mup-vs">VS</span><span class="${hc(m.away).cls}">${m.away}隊</span></div></div>`
-    ).join('');
+    if (!weekData.matchups || !weekData.matchups.length) {
+      container.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--txt-light)">本週尚無對戰組合</div>';
+      return;
+    }
+
+    container.innerHTML = weekData.matchups.map(buildMatchupResultCard).join('');
   }
 
-  /* ── Fetch & Init ── */
+  /* ═══════════════════════════════
+     Week navigation
+     ═══════════════════════════════ */
+  function parseGameDate(dateStr) {
+    if (!dateStr) return null;
+    // Handle formats like "2026/2/7", "2026/2/14（六）07:30", "2026 / 2 / 14（六）07:30"
+    const clean = dateStr.replace(/\s/g, '').replace(/（.*$/, '');
+    const parts = clean.split('/');
+    if (parts.length >= 3) {
+      return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    }
+    return null;
+  }
+
+  function findCurrentIndex(allWeeks, currentWeek) {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // Find the latest finished game week whose date has passed (after 23:59:59)
+    // Then default to the NEXT game week after it
+    let latestPassedIdx = -1;
+    for (let i = 0; i < allWeeks.length; i++) {
+      const entry = allWeeks[i];
+      if (!entry.date) continue;
+      const gameDate = parseGameDate(entry.date);
+      if (!gameDate) continue;
+      // If today > game date (i.e. game day has fully passed)
+      if (todayStart > gameDate) {
+        latestPassedIdx = i;
+      }
+    }
+
+    if (latestPassedIdx >= 0) {
+      // Find the next game week (skip suspended weeks)
+      for (let i = latestPassedIdx + 1; i < allWeeks.length; i++) {
+        if (allWeeks[i].type === 'game') return i;
+      }
+      // No future game week found — stay on the latest passed
+      return latestPassedIdx;
+    }
+
+    // Fallback: find by currentWeek
+    for (let i = 0; i < allWeeks.length; i++) {
+      if (allWeeks[i].type === 'game' && allWeeks[i].week === currentWeek) return i;
+    }
+    return 0;
+  }
+
+  function getPhaseWeekLabel(entry) {
+    if (!entry || entry.type !== 'game') return '';
+    const phase = entry.phase;
+    // 找出同一賽制中最小的 week，計算相對週次
+    let minWeek = entry.week;
+    if (_schedule && _schedule.allWeeks) {
+      for (const w of _schedule.allWeeks) {
+        if (w.type === 'game' && w.phase === phase && w.week < minWeek) {
+          minWeek = w.week;
+        }
+      }
+    }
+    const relativeWeek = entry.week - minWeek + 1;
+    return `${phase} · 第 ${relativeWeek} 週`;
+  }
+
+  function updateHero(entry) {
+    const heroContent = document.getElementById('sched-hero-content');
+    if (!heroContent) return;
+
+    if (entry.type === 'suspended') {
+      heroContent.innerHTML = `
+        <div class="sched-hero-left">
+          <div class="eyebrow" style="color:var(--orange2);margin-bottom:.4rem">第 25 屆</div>
+          <h2 style="font-size:1.8rem;margin-bottom:0">停賽</h2>
+        </div>
+        <div class="sched-hero-right">
+          <div class="sched-hero-date">${entry.date}</div>
+          <div class="sched-hero-venue">${entry.venue}</div>
+        </div>`;
+    } else {
+      const label = getPhaseWeekLabel(entry);
+      heroContent.innerHTML = `
+        <div class="sched-hero-left">
+          <div class="eyebrow" style="color:var(--orange2);margin-bottom:.4rem">第 25 屆</div>
+          <h2 style="font-size:1.8rem;margin-bottom:0">${label}</h2>
+        </div>
+        <div class="sched-hero-right">
+          <div class="sched-hero-date">${entry.date}</div>
+          <div class="sched-hero-venue">${entry.venue}</div>
+        </div>`;
+    }
+  }
+
+  function updateNavButtons() {
+    const allWeeks = _schedule.allWeeks;
+    const prevBtn = document.getElementById('btn-prev-week');
+    const nextBtn = document.getElementById('btn-next-week');
+    const wkLabel = document.getElementById('wk-label');
+
+    if (prevBtn) prevBtn.style.visibility = (_viewIndex <= 0) ? 'hidden' : '';
+    if (nextBtn) nextBtn.style.visibility = (_viewIndex >= allWeeks.length - 1) ? 'hidden' : '';
+
+    const entry = allWeeks[_viewIndex];
+    if (wkLabel) {
+      if (entry.type === 'suspended') {
+        wkLabel.textContent = `停賽 · ${entry.date}`;
+      } else {
+        wkLabel.textContent = getPhaseWeekLabel(entry);
+      }
+    }
+  }
+
+  function renderWeekView() {
+    if (!_schedule || _viewIndex < 0) return;
+    const entry = _schedule.allWeeks[_viewIndex];
+
+    updateHero(entry);
+    updateNavButtons();
+
+    const viewToggle = document.getElementById('sched-view-toggle');
+    const viewMatchup = document.getElementById('view-matchup');
+    const viewOrder = document.getElementById('view-order');
+    const suspended = document.getElementById('sched-suspended');
+
+    if (entry.type === 'suspended') {
+      // 停賽週
+      if (viewToggle) viewToggle.style.display = 'none';
+      if (viewMatchup) viewMatchup.style.display = 'none';
+      if (viewOrder) viewOrder.style.display = 'none';
+
+      if (suspended) {
+        suspended.style.display = '';
+        suspended.innerHTML = `
+          <div class="card" style="text-align:center;padding:2.5rem 1rem">
+            <div style="font-size:2rem;margin-bottom:.6rem">🏖️</div>
+            <div style="font-weight:700;font-size:1.1rem;margin-bottom:.4rem">本週停賽</div>
+            <div style="color:var(--txt-light);font-size:.9rem">${entry.reason || ''}</div>
+          </div>`;
+      }
+    } else {
+      // 比賽週
+      if (suspended) suspended.style.display = 'none';
+      if (viewToggle) viewToggle.style.display = '';
+
+      // 有賽程順序（且已排定隊伍）時預設顯示賽程順序，否則顯示對戰組合
+      const hasGames = entry.games && entry.games.length > 0 && entry.games[0].home;
+      showSchedView(hasGames ? 'order' : 'matchup');
+
+      renderScheduleMatchups(entry);
+      renderSchedulePage(entry);
+    }
+  }
+
+  function navigateWeek(dir) {
+    if (!_schedule) return;
+    const newIdx = _viewIndex + (dir === 'prev' ? -1 : 1);
+    if (newIdx < 0 || newIdx >= _schedule.allWeeks.length) return;
+    _viewIndex = newIdx;
+    renderWeekView();
+  }
+
+  /* ═══════════════════════════════
+     Home page schedule header update
+     ═══════════════════════════════ */
+  function updateHomeSchedHeader(entry) {
+    const container = document.getElementById('home-sched-header');
+    if (!container) return;
+    const label = getPhaseWeekLabel(entry);
+    const dateEl = container.querySelector('.stb-date');
+    const locEl = container.querySelector('.stb-loc');
+    const weekEl = container.querySelector('.stb-week');
+    if (dateEl) dateEl.textContent = '📅 ' + entry.date;
+    if (locEl) locEl.textContent = '📍 ' + entry.venue;
+    if (weekEl) weekEl.textContent = '第 25 屆・' + label;
+  }
+
+  /* ═══════════════════════════════
+     Fetch & Init
+     ═══════════════════════════════ */
   async function loadSchedule() {
     try {
       const data = await api.getSchedule();
       _schedule = data;
 
       const currentWeek = data.currentWeek;
-      const weekData = data.weeks[String(currentWeek)];
 
-      if (!weekData) return;
+      // Schedule page: initialize navigation
+      if (document.getElementById('btn-prev-week')) {
+        _viewIndex = findCurrentIndex(data.allWeeks, currentWeek);
+        renderWeekView();
+      }
 
-      // Update hero info if elements exist
-      const heroDate = document.getElementById('sched-hero-date');
-      if (heroDate) heroDate.textContent = `${weekData.date} ${weekData.time} · ${weekData.venue}`;
-
-      // Render depending on which page we're on
-      renderHomeSchedule(weekData);
-      renderSchedulePage(weekData);
-      renderScheduleMatchups(weekData);
+      // Home page: render the effective current week into home containers
+      // Use the same date-based logic: find the next upcoming game week
+      const homeIdx = findCurrentIndex(data.allWeeks, currentWeek);
+      const homeEntry = data.allWeeks[homeIdx];
+      if (homeEntry && homeEntry.type === 'game') {
+        window._effectiveHomeEntry = homeEntry;
+        renderHomeSchedule(homeEntry);
+        // Update home schedule header (may be re-called if loadHome finishes later)
+        updateHomeSchedHeader(homeEntry);
+      } else {
+        const weekData = data.weeks[String(currentWeek)];
+        if (weekData) {
+          renderHomeSchedule(weekData);
+        }
+      }
     } catch (err) {
       console.error('載入賽程資料失敗:', err);
       const container = document.getElementById('sched-games');
@@ -173,7 +445,6 @@
 
   // 暴露全域
   window.loadSchedule = loadSchedule;
-
-  // 注意：不在這裡自動呼叫 loadSchedule
-  // 由各頁面的 HTML 或 page-home.js 決定何時呼叫
+  window.navigateWeek = navigateWeek;
+  window.getPhaseWeekLabel = getPhaseWeekLabel;
 })();

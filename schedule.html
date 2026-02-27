@@ -13,24 +13,25 @@
 <nav class="bottom-nav" id="bottom-nav"></nav>
 
 <div class="wrap">
-  <!-- HERO -->
-  <div class="sched-hero">
-    <div>
-      <div class="eyebrow" style="color:var(--orange2);margin-bottom:.4rem">第 25 屆</div>
-      <h2 style="font-size:1.8rem;margin-bottom:.25rem">例行賽 第 3 週</h2>
-      <div class="sched-meta"><strong>2026 / 2 / 14（六）07:30 · 三重體育館</strong></div>
+  <!-- HERO（動態渲染） -->
+  <div class="sched-hero" id="sched-hero">
+    <div id="sched-hero-content">
+      <!-- 由 page-schedule.js 動態填入 -->
     </div>
   </div>
 
   <!-- 週次切換 -->
   <div class="week-nav">
-    <button class="wbtn">← 前一週</button>
-    <div class="wk-lbl">例行賽 第 3 週</div>
-    <button class="wbtn">下一週 →</button>
+    <button id="btn-prev-week" class="wbtn" onclick="navigateWeek('prev')">← 前一週</button>
+    <div id="wk-label" class="wk-lbl"></div>
+    <button id="btn-next-week" class="wbtn" onclick="navigateWeek('next')">下一週 →</button>
   </div>
 
+  <!-- 停賽提示（預設隱藏） -->
+  <div id="sched-suspended" style="display:none"></div>
+
   <!-- 對戰組合 / 賽程順序 toggle -->
-  <div class="sched-view-toggle">
+  <div class="sched-view-toggle" id="sched-view-toggle">
     <button id="btn-matchup" class="sched-toggle-btn active-toggle" onclick="showSchedView('matchup')">對戰組合</button>
     <button id="btn-order"   class="sched-toggle-btn"              onclick="showSchedView('order')">賽程順序</button>
   </div>
@@ -40,8 +41,8 @@
     <div class="matchup-grid" id="sched-matchup-grid">
       <!-- 由 page-schedule.js 動態渲染 -->
     </div>
-    <div style="padding:.4rem .7rem;background:var(--warm1);border-radius:var(--r-sm);font-family:var(--font-cond);font-size:.72rem;color:var(--txt-light)">
-      ℹ️ 對戰組合週初確定 · 賽程順序每週四由管理員公告
+    <div id="matchup-hint" style="margin-top:.5rem;padding:.4rem .7rem;background:var(--warm1);border-radius:var(--r-sm);font-family:var(--font-cond);font-size:.72rem;color:var(--txt-light)">
+      ℹ️ 對戰組合週初確定 · 本週場次順序尚未公告，請留意管理員通知
     </div>
   </div>
 

@@ -104,7 +104,7 @@
   /* ── 渲染迷你數據榜 ── */
   function renderHomeMiniStats(data) {
     const container = document.getElementById('home-stats');
-    if (!container) return;
+    if (!container || !data.miniStats) return;
 
     const categories = ['pts', 'reb', 'ast', 'stl', 'blk'];
 
@@ -166,6 +166,19 @@
         <button onclick="showSched('matchup')" id="btn-matchup" class="sched-toggle-btn active-toggle">對戰組合</button>
         <button onclick="showSched('order')" id="btn-order" class="sched-toggle-btn">賽程順序</button>
       </div>`;
+    // 預設 matchup active，loadSchedule 完成後會依資料覆蓋正確狀態
+    // 若 loadSchedule 已先完成，使用其計算的有效週次覆蓋 header
+    if (window._effectiveHomeEntry) {
+      const e = window._effectiveHomeEntry;
+      const dateEl = container.querySelector('.stb-date');
+      const locEl = container.querySelector('.stb-loc');
+      const weekEl = container.querySelector('.stb-week');
+      if (dateEl) dateEl.textContent = '📅 ' + e.date;
+      if (locEl) locEl.textContent = '📍 ' + e.venue;
+      if (weekEl && typeof getPhaseWeekLabel === 'function') {
+        weekEl.textContent = '第 25 屆・' + getPhaseWeekLabel(e);
+      }
+    }
   }
 
   /* ── Fetch & Init ── */

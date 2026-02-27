@@ -53,7 +53,8 @@
         const sepStyle = i > 0 ? ' style="border-left:1px solid var(--warm1)"' : '';
         tbody += `<td${sepStyle}>${attCell(v)}</td>`;
       });
-      tbody += `<td class="week-sep"><span class="att-summary">${present}<span style="color:var(--txt-light);font-size:.7rem">/${done}</span></span><span class="att-pct">${pct}%</span></td></tr>`;
+      const pctColor = pct >= 70 ? 'var(--green)' : pct >= 50 ? '#b38f00' : 'var(--red)';
+      tbody += `<td class="week-sep"><span class="att-pct" style="color:${pctColor}">${pct}%</span><span class="att-summary">${present}/${done}</span></td></tr>`;
     });
     tbody += '</tbody>';
 

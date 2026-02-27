@@ -14,16 +14,25 @@
       const tc = TEAM_CONFIG[t.team] || {};
       const pctCls = parseFloat(t.pct) >= 60 ? ' class="pct-g"' : (parseFloat(t.pct) < 30 ? ' class="pct-b"' : '');
       const badgeCls = t.streakType === 'win' ? 'bw' : 'bl';
+
+      // 近況 W/L dots
+      const histHtml = (t.history || []).map((h, i) => {
+        const isLast = i === t.history.length - 1;
+        const cls = h === 'W' ? 'wl-dot wl-w' : 'wl-dot wl-l';
+        return `<span class="${cls}${isLast ? ' wl-latest' : ''}">${h === 'W' ? '○' : '✕'}</span>`;
+      }).join('');
+
       return `<tr>
         <td><div class="st-team"><span class="st-rank">${t.rank}</span><span class="dot ${tc.dot}"></span><span class="${tc.cls}">${t.name}</span></div></td>
         <td>${t.wins}</td><td>${t.losses}</td>
         <td${pctCls}>${t.pct}</td>
+        <td><div class="st-hist">${histHtml}</div></td>
         <td><span class="badge ${badgeCls}">${t.streak}</span></td>
       </tr>`;
     }).join('');
 
     return `<table class="st-table">
-      <thead><tr><th>名次</th><th>勝</th><th>敗</th><th>勝率</th><th>近況</th></tr></thead>
+      <thead><tr><th>名次</th><th>勝</th><th>敗</th><th>勝率</th><th>近況</th><th>連</th></tr></thead>
       <tbody>${tbody}</tbody>
     </table>`;
   }
@@ -36,9 +45,9 @@
       const tc = TEAM_CONFIG[t] || {};
       const cells = results[ri].map((val, ci) => {
         if (val === null) return '<td class="self">—</td>';
-        return val > 0
-          ? `<td class="tg">+${val}</td>`
-          : `<td class="tb">${val}</td>`;
+        if (val > 0) return `<td class="tg">+${val}</td>`;
+        if (val < 0) return `<td class="tb">${val}</td>`;
+        return `<td>0</td>`;
       }).join('');
       return `<tr><td class="fw7 ${tc.cls}">${t}</td>${cells}</tr>`;
     }).join('');

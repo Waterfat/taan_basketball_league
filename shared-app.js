@@ -26,11 +26,12 @@ const NAV_ITEMS = [
   { id: 'standings',label: '戰績榜',     icon: '🏆', file: 'standings.html' },
   { id: 'roster',   label: '球員名單',   icon: '👥', file: 'roster.html' },
   { id: 'dragon',   label: '龍虎榜',     icon: '🐉', file: 'dragon.html' },
-  { id: 'stats',    label: '數據',       icon: '📊', file: 'stats.html' },
-  { id: 'rotation', label: '輪值',       icon: '📋', file: 'rotation.html' },
-  { id: 'history',  label: '歷史',       icon: '📜', file: 'history.html' },
-  { id: 'hof',      label: '名人堂',     icon: '🏛', file: 'hof.html' },
-  { id: 'announce', label: '公告',       icon: '📢', file: 'announce.html' },
+  // 以下功能暫不開放，待後續版本製作
+  // { id: 'stats',    label: '數據',       icon: '📊', file: 'stats.html' },
+  // { id: 'rotation', label: '輪值',       icon: '📋', file: 'rotation.html' },
+  // { id: 'history',  label: '歷史',       icon: '📜', file: 'history.html' },
+  // { id: 'hof',      label: '名人堂',     icon: '🏛', file: 'hof.html' },
+  // { id: 'announce', label: '公告',       icon: '📢', file: 'announce.html' },
 ];
 
 /* ── Detect current page ── */
@@ -67,6 +68,14 @@ function initNavigation() {
     });
     html += '</div>';
     bottomNav.innerHTML = html;
+
+    // 捲動到目前頁面的按鈕位置，避免重置到最左方
+    const activeBtn = bottomNav.querySelector('a.active');
+    if (activeBtn) {
+      requestAnimationFrame(() => {
+        activeBtn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' });
+      });
+    }
   }
 }
 

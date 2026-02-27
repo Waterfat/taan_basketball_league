@@ -186,34 +186,172 @@ const MOCK_DATA = {
     ]
   },
 
-  /* ── 賽程 schedule ── */
+  /* ── 賽程 schedule（全季） ── */
   schedule: {
     season: 25,
-    phase: "例行賽",
-    currentWeek: 3,
-    totalWeeks: 10,
-    weeks: {
-      "3": {
-        date: "2026/2/14（六）",
-        time: "07:30",
-        venue: "三重體育館",
+    currentWeek: 5,
+    allWeeks: [
+      /* 第 1 週 — 熱身賽（已完成） */
+      {
+        type: "game", week: 1, date: "2026/1/10", phase: "熱身賽", venue: "中正",
         matchups: [
-          { combo: 1, home: "黃", away: "綠" },
-          { combo: 2, home: "黑", away: "白" },
-          { combo: 3, home: "紅", away: "藍" },
-          { combo: 4, home: "白", away: "黃" },
-          { combo: 5, home: "綠", away: "紅" },
-          { combo: 6, home: "藍", away: "黑" }
+          { combo: 1, home: "白", away: "紅", homeScore: 22, awayScore: 34, status: "finished" },
+          { combo: 2, home: "黃", away: "黑", homeScore: 22, awayScore: 23, status: "finished" },
+          { combo: 3, home: "藍", away: "綠", homeScore: 20, awayScore: 28, status: "finished" },
+          { combo: 4, home: "黑", away: "白", homeScore: 17, awayScore: 21, status: "finished" },
+          { combo: 5, home: "紅", away: "藍", homeScore: 14, awayScore: 20, status: "finished" },
+          { combo: 6, home: "綠", away: "黃", homeScore: 21, awayScore: 22, status: "finished" }
         ],
         games: [
-          { num: 1, time: "07:30", home: "黃", away: "綠", homeScore: 22, awayScore: 34, status: "finished", staff: { "裁判": ["李昊明(黑)","李政軒(黑)","陳怡舟(白)"], "場務": ["林毅豐(黑)","喻柏淵(黑)","王昶竣(白)"], "攝影": ["陳曉川(白)"], "器材": ["林光偉(綠)"], "數據": ["韋承志(紅) ✦+1積分"], "場控": ["林光偉(綠)"] } },
-          { num: 2, time: "08:00", home: "黑", away: "白", homeScore: 22, awayScore: 23, status: "finished", staff: { "裁判": ["吳軒宇(紅)","江錒哲(黃)","趙伯熙(綠)"], "場務": ["阮柏翰(紅)","馮是翔(藍)","余芑滌(紅)"] } },
-          { num: 3, time: "08:30", home: "紅", away: "藍", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
-          { num: 4, time: "09:00", home: "白", away: "黃", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
-          { num: 5, time: "09:30", home: "綠", away: "紅", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
-          { num: 6, time: "10:00", home: "藍", away: "黑", homeScore: null, awayScore: null, status: "upcoming", staff: {} }
+          { num: 1, time: "", home: "白", away: "紅", homeScore: 22, awayScore: 34, status: "finished", staff: { "場務": ["李子昂(黑)","盧以朋(黃)","連育樟(綠)"], "攝影": ["楊承達(黑)"], "器材": ["陳曉川(白)","韋承志(紅)"] } },
+          { num: 2, time: "", home: "黃", away: "黑", homeScore: 22, awayScore: 23, status: "finished", staff: { "場務": ["余芑滌(紅)","竺立梵(白)","王昶竣(白)"], "攝影": ["林浚鑫(白)"], "器材": ["陳彥汗(白)","李子昂(黑)"] } },
+          { num: 3, time: "", home: "藍", away: "綠", homeScore: 20, awayScore: 28, status: "finished", staff: { "場務": ["陳泓瑋(白)","林志柏(黑)","張裕棠(黑)"], "攝影": ["楊凱翔(紅)"], "器材": ["吳家豪(綠)"] } },
+          { num: 4, time: "", home: "黑", away: "白", homeScore: 17, awayScore: 21, status: "finished", staff: { "場務": ["吳軒宇(紅)","黃偉訓(綠)","王進興(藍)"], "攝影": ["涂意証(綠)"], "器材": ["李昊明(黑)"] } },
+          { num: 5, time: "", home: "紅", away: "藍", homeScore: 14, awayScore: 20, status: "finished", staff: { "場務": ["張仁豪(綠)","曾昱嘉(綠)","吳冠德(黃)"], "攝影": ["陳鈞銘(黃)"], "器材": ["趙尹旋(紅)"] } },
+          { num: 6, time: "", home: "綠", away: "黃", homeScore: 21, awayScore: 22, status: "finished", staff: { "場務": ["周昱丞(紅)","董鎧維(藍)","胡展綸(藍)"], "攝影": ["陳頤(藍)"], "器材": ["林光偉(綠)"] } }
+        ]
+      },
+      /* 第 2 週 — 熱身賽（已完成） */
+      {
+        type: "game", week: 2, date: "2026/1/17", phase: "熱身賽", venue: "中正",
+        matchups: [
+          { combo: 1, home: "白", away: "藍", homeScore: 17, awayScore: 24, status: "finished" },
+          { combo: 2, home: "黑", away: "綠", homeScore: 16, awayScore: 24, status: "finished" },
+          { combo: 3, home: "黃", away: "紅", homeScore: 15, awayScore: 21, status: "finished" },
+          { combo: 4, home: "綠", away: "白", homeScore: 25, awayScore: 21, status: "finished" },
+          { combo: 5, home: "藍", away: "黃", homeScore: 24, awayScore: 19, status: "finished" },
+          { combo: 6, home: "紅", away: "黑", homeScore: 19, awayScore: 29, status: "finished" }
+        ],
+        games: [
+          { num: 1, time: "", home: "白", away: "藍", homeScore: 17, awayScore: 24, status: "finished", staff: { "裁判": ["李子昂(黑)","趙伯熙(綠)","陳國弘(黑)"], "場務": ["黃偉訓(綠)","吳家豪(綠)","楊秉諺(綠)"], "攝影": ["李昊明(黑)"], "器材": ["陳曉川(白)","林光偉(綠)"] } },
+          { num: 2, time: "", home: "黑", away: "綠", homeScore: 16, awayScore: 24, status: "finished", staff: { "裁判": ["李勁緯(藍)","吳軒宇(紅)","李崢嶸(藍)"], "場務": ["粘智翔(藍)","吳冠德(黃)","王昶竣(白)"], "攝影": ["陳頤(藍)"], "器材": ["陳彥汗(白)","趙尹旋(紅)"] } },
+          { num: 3, time: "", home: "黃", away: "紅", homeScore: 15, awayScore: 21, status: "finished", staff: { "裁判": ["陳怡舟(白)","林昇德(白)","趙伯熙(綠)"], "場務": ["陳頤(藍)","馮是翔(藍)","喻柏淵(黑)"], "攝影": ["涂意証(綠)"], "器材": ["韋承志(紅)"] } },
+          { num: 4, time: "", home: "綠", away: "白", homeScore: 25, awayScore: 21, status: "finished", staff: { "裁判": ["陳國弘(黑)","粘智翔(藍)","陳鼎煬(黃)"], "場務": ["蔡一聲(紅)","韋承志(紅)","李宗漢(黃)"], "攝影": ["盧以朋(黃)"], "器材": ["吳家豪(綠)"] } },
+          { num: 5, time: "", home: "藍", away: "黃", homeScore: 24, awayScore: 19, status: "finished", staff: { "裁判": ["陳怡舟(白)","林昇德(白)","彥榕(白)"], "場務": ["周昱丞(紅)","余芑滌(紅)","李艾恩(紅)"], "攝影": ["楊承達(黑)"], "器材": ["趙尹旋(紅)"] } },
+          { num: 6, time: "", home: "紅", away: "黑", homeScore: 19, awayScore: 29, status: "finished", staff: { "裁判": ["李勁緯(藍)","陳鼎煬(黃)","彥榕(白)"], "場務": ["陳彥廷(黃)","董鎧維(藍)","李世昌(黃)"], "攝影": ["盧以朋(黃)"], "器材": ["李昊明(黑)"] } }
+        ]
+      },
+      /* 第 3 週 — 例行賽（已完成） */
+      {
+        type: "game", week: 3, date: "2026/1/24", phase: "例行賽", venue: "中正",
+        matchups: [
+          { combo: 1, home: "綠", away: "紅", homeScore: 29, awayScore: 23, status: "finished" },
+          { combo: 2, home: "藍", away: "黑", homeScore: 10, awayScore: 15, status: "finished" },
+          { combo: 3, home: "黃", away: "白", homeScore: 16, awayScore: 21, status: "finished" },
+          { combo: 4, home: "黑", away: "綠", homeScore: 18, awayScore: 31, status: "finished" },
+          { combo: 5, home: "紅", away: "黃", homeScore: 21, awayScore: 18, status: "finished" },
+          { combo: 6, home: "白", away: "藍", homeScore: 16, awayScore: 10, status: "finished" }
+        ],
+        games: [
+          { num: 1, time: "", home: "綠", away: "紅", homeScore: 29, awayScore: 23, status: "finished", staff: { "裁判": ["胡展綸(藍)","李崢嶸(藍)","林昇德(白)"], "場務": ["林毅豐(黑)","吳佳憲(藍)","陳泓瑋(白)"], "攝影": ["林浚鑫(白)"], "器材": ["陳曉川(白)","趙尹旋(紅)"] } },
+          { num: 2, time: "", home: "藍", away: "黑", homeScore: 10, awayScore: 15, status: "finished", staff: { "裁判": ["林昇德(白)","陳鼎煬(黃)","趙伯熙(綠)"], "場務": ["張仁豪(綠)","李艾恩(紅)","李世昌(黃)"], "攝影": ["涂意証(綠)"], "器材": ["陳彥汗(白)","李昊明(黑)"] } },
+          { num: 3, time: "", home: "黃", away: "白", homeScore: 16, awayScore: 21, status: "finished", staff: { "裁判": ["李崢嶸(藍)","李勁緯(藍)","李子昂(黑)"], "場務": ["楊秉諺(綠)","張裕棠(黑)","喻柏淵(黑)"], "攝影": ["涂意証(綠)"], "器材": ["林光偉(綠)"] } },
+          { num: 4, time: "", home: "黑", away: "綠", homeScore: 18, awayScore: 31, status: "finished", staff: { "裁判": ["江錒哲(黃)","竺立梵(白)","胡展綸(藍)"], "場務": ["李宗漢(黃)","陳彥廷(黃)","王昶竣(白)"], "攝影": ["陳頤(藍)"], "器材": ["吳家豪(綠)"] } },
+          { num: 5, time: "", home: "紅", away: "黃", homeScore: 21, awayScore: 18, status: "finished", staff: { "裁判": ["粘智翔(藍)","陳怡舟(白)","竺立梵(白)"], "場務": ["黃偉訓(綠)","董鎧維(藍)","連育樟(綠)"], "攝影": ["林浚鑫(白)"], "器材": ["韋承志(紅)"] } },
+          { num: 6, time: "", home: "白", away: "藍", homeScore: 16, awayScore: 10, status: "finished", staff: { "裁判": ["陳國弘(黑)","江錒哲(黃)","陳鼎煬(黃)"], "場務": ["江禮安(黃)","連育樟(綠)","李道頤(綠)"], "攝影": ["陳鈞銘(黃)"], "器材": ["趙尹旋(紅)"] } }
+        ]
+      },
+      /* 第 4 週 — 例行賽（已完成） */
+      {
+        type: "game", week: 4, date: "2026/1/31", phase: "例行賽", venue: "中正",
+        matchups: [
+          { combo: 1, home: "黃", away: "黑", homeScore: 19, awayScore: 18, status: "finished" },
+          { combo: 2, home: "綠", away: "藍", homeScore: 19, awayScore: 20, status: "finished" },
+          { combo: 3, home: "紅", away: "白", homeScore: 24, awayScore: 20, status: "finished" },
+          { combo: 4, home: "藍", away: "黃", homeScore: 8, awayScore: 21, status: "finished" },
+          { combo: 5, home: "黑", away: "紅", homeScore: 14, awayScore: 16, status: "finished" },
+          { combo: 6, home: "白", away: "綠", homeScore: 25, awayScore: 19, status: "finished" }
+        ],
+        games: [
+          { num: 1, time: "", home: "黃", away: "黑", homeScore: 19, awayScore: 18, status: "finished", staff: { "裁判": ["粘智翔(藍)","彥榕(白)","陳怡舟(白)"], "場務": ["韋承志(紅)","趙伯熙(綠)","楊秉諺(綠)"], "攝影": ["陳頤(藍)"], "器材": ["陳曉川(白)","李政軒(黑)"] } },
+          { num: 2, time: "", home: "綠", away: "藍", homeScore: 19, awayScore: 20, status: "finished", staff: { "裁判": ["彥榕(白)","李世昌(黃)","林昇德(白)"], "場務": ["阮柏翰(紅)","林顥軒(紅)","盧以朋(黃)"], "攝影": ["楊凱翔(紅)"], "器材": ["陳彥汗(白)","李昊明(黑)"] } },
+          { num: 3, time: "", home: "紅", away: "白", homeScore: 24, awayScore: 20, status: "finished", staff: { "裁判": ["胡展綸(藍)","李子昂(黑)","錢威遠(綠)"], "場務": ["江禮安(黃)","李世昌(黃)","陳鈞銘(黃)"], "攝影": ["涂意証(綠)"], "器材": ["徐子超(白)","趙尹旋(紅)"] } },
+          { num: 4, time: "", home: "藍", away: "黃", homeScore: 8, awayScore: 21, status: "finished", staff: { "裁判": ["錢威遠(綠)","竺立梵(白)","趙伯熙(綠)"], "場務": ["彥榕(白)","陳泓瑋(白)","林毅豐(黑)"], "攝影": ["楊承達(黑)"], "器材": ["林光偉(綠)"] } },
+          { num: 5, time: "", home: "黑", away: "紅", homeScore: 14, awayScore: 16, status: "finished", staff: { "裁判": ["李勁緯(藍)","林昇德(白)","錢威遠(綠)"], "場務": ["陳彥廷(黃)","董鎧維(藍)","吳冠德(黃)"], "攝影": ["王進興(藍)"], "器材": ["韋承志(紅)"] } },
+          { num: 6, time: "", home: "白", away: "綠", homeScore: 25, awayScore: 19, status: "finished", staff: { "裁判": ["李昊明(黑)","胡展綸(藍)","粘智翔(藍)"], "場務": ["韋承志(紅)","張裕棠(黑)","喻柏淵(黑)"], "攝影": ["梁修綸(黑)"], "器材": ["陳曉川(白)","吳家豪(綠)"] } }
+        ]
+      },
+      /* 第 5 週 — 例行賽（已完成，最新） */
+      {
+        type: "game", week: 5, date: "2026/2/7", phase: "例行賽", venue: "三重",
+        matchups: [
+          { combo: 1, home: "黃", away: "綠", homeScore: 19, awayScore: 21, status: "finished" },
+          { combo: 2, home: "黑", away: "白", homeScore: 29, awayScore: 15, status: "finished" },
+          { combo: 3, home: "紅", away: "藍", homeScore: 20, awayScore: 9, status: "finished" },
+          { combo: 4, home: "白", away: "黃", homeScore: 15, awayScore: 17, status: "finished" },
+          { combo: 5, home: "綠", away: "紅", homeScore: 22, awayScore: 21, status: "finished" },
+          { combo: 6, home: "藍", away: "黑", homeScore: 14, awayScore: 17, status: "finished" }
+        ],
+        games: [
+          { num: 1, time: "", home: "黃", away: "綠", homeScore: 19, awayScore: 21, status: "finished", staff: { "裁判": ["李昊明(黑)","李政軒(黑)","陳怡舟(白)"], "場務": ["林毅豐(黑)","喻柏淵(黑)","王昶竣(白)"], "攝影": ["陳曉川(白)"], "器材": ["林光偉(綠)"] } },
+          { num: 2, time: "", home: "黑", away: "白", homeScore: 29, awayScore: 15, status: "finished", staff: { "裁判": ["吳軒宇(紅)","江錒哲(黃)","趙伯熙(綠)"], "場務": ["阮柏翰(紅)","馮是翔(藍)","余芑滌(紅)"], "攝影": ["林志偉(黃)"], "器材": ["徐子超(白)","李子昂(黑)"] } },
+          { num: 3, time: "", home: "紅", away: "藍", homeScore: 20, awayScore: 9, status: "finished", staff: { "裁判": ["梁修綸(黑)","陳鼎煬(黃)","林志柏(黑)"], "場務": ["江禮安(黃)","李宗漢(黃)","李世昌(黃)"], "攝影": ["陳鈞銘(黃)"], "器材": ["韋承志(紅)"] } },
+          { num: 4, time: "", home: "白", away: "黃", homeScore: 15, awayScore: 17, status: "finished", staff: { "裁判": ["梁修綸(黑)","粘智翔(藍)","李昊明(黑)"], "場務": ["黃偉訓(綠)","阮柏翰(紅)","馮是翔(藍)"], "攝影": ["楊凱翔(紅)"], "器材": ["吳家豪(綠)"] } },
+          { num: 5, time: "", home: "綠", away: "紅", homeScore: 22, awayScore: 21, status: "finished", staff: { "裁判": ["林志柏(黑)","粘智翔(藍)","彥榕(白)"], "場務": ["王進興(藍)","陳泓瑋(白)","吳冠德(黃)"], "攝影": ["楊承達(黑)"], "器材": ["趙尹旋(紅)"] } },
+          { num: 6, time: "", home: "藍", away: "黑", homeScore: 14, awayScore: 17, status: "finished", staff: { "裁判": ["陳怡舟(白)","彥榕(白)","林光偉(綠)"], "場務": ["楊秉諺(綠)","連育樟(綠)","張仁豪(綠)"], "攝影": ["涂意証(綠)"], "器材": ["李政軒(黑)"] } }
+        ]
+      },
+      /* 停賽 — 過年連假 */
+      { type: "suspended", date: "2026/2/14", venue: "大安", reason: "過年連假" },
+      { type: "suspended", date: "2026/2/21", venue: "大安", reason: "過年連假" },
+      { type: "suspended", date: "2026/2/28", venue: "大安", reason: "228連假" },
+      /* 第 6 週 — 例行賽（未來）— matchups 來自對戰組合表 */
+      {
+        type: "game", week: 6, date: "2026/3/7", phase: "例行賽", venue: "中正",
+        matchups: [
+          { combo: 1, home: "黃", away: "藍", homeScore: null, awayScore: null, status: "upcoming" },
+          { combo: 2, home: "黑", away: "紅", homeScore: null, awayScore: null, status: "upcoming" },
+          { combo: 3, home: "綠", away: "白", homeScore: null, awayScore: null, status: "upcoming" },
+          { combo: 4, home: "黑", away: "黃", homeScore: null, awayScore: null, status: "upcoming" },
+          { combo: 5, home: "藍", away: "綠", homeScore: null, awayScore: null, status: "upcoming" },
+          { combo: 6, home: "紅", away: "白", homeScore: null, awayScore: null, status: "upcoming" }
+        ],
+        games: [
+          { num: 1, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
+          { num: 2, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
+          { num: 3, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
+          { num: 4, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
+          { num: 5, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
+          { num: 6, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} }
+        ]
+      },
+      /* 第 7 週 — 例行賽（未來）— matchups 來自對戰組合表 */
+      {
+        type: "game", week: 7, date: "2026/3/14", phase: "例行賽", venue: "中正",
+        matchups: [
+          { combo: 1, home: "白", away: "黑", homeScore: null, awayScore: null, status: "upcoming" },
+          { combo: 2, home: "綠", away: "黃", homeScore: null, awayScore: null, status: "upcoming" },
+          { combo: 3, home: "藍", away: "紅", homeScore: null, awayScore: null, status: "upcoming" },
+          { combo: 4, home: "黑", away: "綠", homeScore: null, awayScore: null, status: "upcoming" },
+          { combo: 5, home: "白", away: "藍", homeScore: null, awayScore: null, status: "upcoming" },
+          { combo: 6, home: "紅", away: "黃", homeScore: null, awayScore: null, status: "upcoming" }
+        ],
+        games: [
+          { num: 1, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
+          { num: 2, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
+          { num: 3, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
+          { num: 4, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
+          { num: 5, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} },
+          { num: 6, time: "", home: "", away: "", homeScore: null, awayScore: null, status: "upcoming", staff: {} }
         ]
       }
+    ],
+    weeks: {
+      "5": { type: "game", week: 5, date: "2026/2/7", phase: "例行賽", venue: "三重", matchups: [
+        { combo: 1, home: "黃", away: "綠", homeScore: 19, awayScore: 21, status: "finished" },
+        { combo: 2, home: "黑", away: "白", homeScore: 29, awayScore: 15, status: "finished" },
+        { combo: 3, home: "紅", away: "藍", homeScore: 20, awayScore: 9, status: "finished" },
+        { combo: 4, home: "白", away: "黃", homeScore: 15, awayScore: 17, status: "finished" },
+        { combo: 5, home: "綠", away: "紅", homeScore: 22, awayScore: 21, status: "finished" },
+        { combo: 6, home: "藍", away: "黑", homeScore: 14, awayScore: 17, status: "finished" }
+      ], games: [
+        { num: 1, time: "", home: "黃", away: "綠", homeScore: 19, awayScore: 21, status: "finished", staff: { "裁判": ["李昊明(黑)","李政軒(黑)","陳怡舟(白)"], "場務": ["林毅豐(黑)","喻柏淵(黑)","王昶竣(白)"], "攝影": ["陳曉川(白)"], "器材": ["林光偉(綠)"] } },
+        { num: 2, time: "", home: "黑", away: "白", homeScore: 29, awayScore: 15, status: "finished", staff: { "裁判": ["吳軒宇(紅)","江錒哲(黃)","趙伯熙(綠)"], "場務": ["阮柏翰(紅)","馮是翔(藍)","余芑滌(紅)"] } },
+        { num: 3, time: "", home: "紅", away: "藍", homeScore: 20, awayScore: 9, status: "finished", staff: {} },
+        { num: 4, time: "", home: "白", away: "黃", homeScore: 15, awayScore: 17, status: "finished", staff: {} },
+        { num: 5, time: "", home: "綠", away: "紅", homeScore: 22, awayScore: 21, status: "finished", staff: {} },
+        { num: 6, time: "", home: "藍", away: "黑", homeScore: 14, awayScore: 17, status: "finished", staff: {} }
+      ]}
     }
   },
 
