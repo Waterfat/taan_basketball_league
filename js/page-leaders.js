@@ -8,11 +8,9 @@
 (function () {
   'use strict';
 
-  const MEDALS = ['🥇', '🥈', '🥉'];
-
-  /* 嘗試解析數字 */
+  /* ── 工具函式 ── */
   function asNum(val) {
-    const n = parseFloat(String(val || '').replace(/,/g, ''));
+    const n = parseFloat(String(val || '').replace(/,/g, '').replace(/%$/, ''));
     return isNaN(n) ? null : n;
   }
 
@@ -20,31 +18,37 @@
   function detectTeam(cell) {
     if (!cell) return null;
     const s = String(cell).trim();
-    // 直接隊名
-    const direct = s.replace(/隊$/, '');
-    if (TEAM_CONFIG[direct]) return direct;
-    // 括號內隊名：姓名(黃)
-    const m = s.match(/\(([^)]+)\)$/);
-    if (m) {
-      const inner = m[1].trim();
-      if (TEAM_CONFIG[inner]) return inner;
-    }
+    if (TEAM_CONFIG[s.replace(/隊$/, '')]) return s.replace(/隊$/, '');
+    const m = s.match(/\(([^)]+)\)?$/);
+    if (m && TEAM_CONFIG[m[1].trim()]) return m[1].trim();
     return null;
   }
 
-  /* 套用隊伍色的 span */
-  function teamSpan(val) {
-    const team = detectTeam(val);
-    if (!team) return val;
-    const tc = TEAM_CONFIG[team];
-    const style = tc.nameStyle ? ` style="${tc.nameStyle}"` : '';
-    return `<span class="${tc.cls}"${style}>${val}</span>`;
+  /* 解析球員姓名 + 隊伍，並去掉 "(X)" 後綴 */
+  function parsePlayer(cell) {
+    if (!cell) return { name: '', team: '' };
+    const s = String(cell).trim();
+    const m = s.match(/^(.+?)\(([^)]*)\)?$/);
+    if (m) {
+      const name = m[1].trim();
+      const raw  = m[2].trim();
+      if (TEAM_CONFIG[raw]) return { name, team: raw };
+    }
+    return { name: s, team: detectTeam(s) || '' };
   }
 
-  /* 找出每欄數值最大的 row index（給 ldr-best 用） */
+  /* 名字 span（套隊伍色） */
+  function nameSpan(name, team) {
+    if (!team || !TEAM_CONFIG[team]) return name;
+    const tc = TEAM_CONFIG[team];
+    const style = tc.nameStyle ? ` style="${tc.nameStyle}"` : '';
+    return `<span class="${tc.cls}"${style}>${name}</span>`;
+  }
+
+  /* 找出每欄最佳值的 row index */
   function findBestPerCol(rows, skipCols) {
-    const best = {};
     const skip = new Set(skipCols);
+    const best = {};
     const colCount = Math.max(...rows.map(r => r.length));
     for (let c = 0; c < colCount; c++) {
       if (skip.has(c)) continue;
@@ -58,91 +62,106 @@
     return best;
   }
 
-  /* ── 個人領先榜 ── */
+  /* ════════════════════════════════
+     個人領先榜 — 11 個方塊
+     ════════════════════════════════ */
   function renderIndividualLeaders(section) {
     const { headers, rows } = section;
-    if (!rows.length) return '';
+    if (!rows.length || !headers.length) return '';
 
     const colCount = Math.max(headers.length, ...rows.map(r => r.length));
 
-    // 自動偵測排名欄（值為 1, 2, 3…）
-    let rankCol = -1;
-    for (let c = 0; c < colCount && rankCol < 0; c++) {
-      const vals = rows.slice(0, Math.min(4, rows.length)).map(r => parseInt(r[c]));
-      if (vals.every((v, i) => v === i + 1)) rankCol = c;
+    // 自動偵測各欄角色
+    let rankCol = -1, nameCol = -1;
+
+    for (let c = 0; c < colCount; c++) {
+      const vals = rows.slice(0, Math.min(4, rows.length)).map(r => (r[c] || '').trim());
+      if (rankCol < 0 && vals.every((v, i) => parseInt(v) === i + 1)) {
+        rankCol = c; continue;
+      }
+      if (nameCol < 0 && vals.some(v => /\([^)]+\)$/.test(v) && detectTeam(v))) {
+        nameCol = c;
+      }
     }
 
-    // 自動偵測隊伍欄
-    let teamCol = -1;
-    for (let c = 0; c < colCount && teamCol < 0; c++) {
-      if (rows.some(r => detectTeam(r[c]))) teamCol = c;
+    // 統計欄（排除排名欄、名字欄）
+    const statCols = [];
+    for (let c = 0; c < colCount; c++) {
+      if (c === rankCol || c === nameCol) continue;
+      const h = (headers[c] || '').trim();
+      if (!h) continue;
+      const vals = rows.map(r => (r[c] || '').trim()).filter(Boolean);
+      if (vals.length && vals.some(v => asNum(v) !== null)) {
+        statCols.push({ col: c, label: h });
+      }
     }
 
-    const skipCols = new Set([rankCol, teamCol].filter(c => c >= 0));
-    const bestPerCol = findBestPerCol(rows, [...skipCols]);
+    if (!statCols.length) return '';
 
-    // 標題列
-    const theadHtml = headers.map((h, i) => {
-      if (i === rankCol) return `<th class="ldr-th ldr-th-rank">#</th>`;
-      const isNum = i > Math.max(rankCol, teamCol >= 0 ? teamCol : -1);
-      return `<th class="ldr-th${isNum ? ' ldr-th-num' : ''}">${h}</th>`;
-    }).join('');
+    // 解析所有球員
+    const players = rows.map(row => {
+      const cell = nameCol >= 0 ? (row[nameCol] || '') : '';
+      const { name, team } = parsePlayer(cell);
+      const stats = {};
+      statCols.forEach(({ col }) => {
+        stats[col] = asNum(row[col]);
+        stats[col + '_raw'] = (row[col] || '').trim();
+      });
+      return { name, team, stats };
+    }).filter(p => p.name);
 
-    // 資料列
-    const tbodyHtml = rows.map((row, ri) => {
-      const rankRaw = rankCol >= 0 ? parseInt(row[rankCol]) : ri + 1;
-      const rank = isNaN(rankRaw) ? ri + 1 : rankRaw;
-      const rankDisplay = rank <= 3 ? MEDALS[rank - 1] : rank;
-      const isTop3 = rank <= 3;
+    // 11 個方塊
+    const MEDALS = ['🥇', '🥈', '🥉'];
+    const cards = statCols.map(({ col, label }, cardIdx) => {
+      const sorted = [...players]
+        .filter(p => p.stats[col] !== null)
+        .sort((a, b) => (b.stats[col] || 0) - (a.stats[col] || 0));
 
-      // 隊伍色
-      let rowTeam = teamCol >= 0 ? detectTeam(row[teamCol]) : null;
-      if (!rowTeam) { for (const c of row) { rowTeam = detectTeam(c); if (rowTeam) break; } }
-      const tc = rowTeam ? (TEAM_CONFIG[rowTeam] || {}) : {};
+      const top3 = sorted.slice(0, 3);
+      const rest = sorted.slice(3);
 
-      const borderColor = tc.color || 'transparent';
-      const bgColor = isTop3 && tc.bg ? tc.bg : (tc.bg ? tc.bg.replace(/[\d.]+\)$/, '.07)') : '');
-      const rowStyle = `border-left:3px solid ${borderColor}${bgColor ? `;background:${bgColor}` : ''}`;
+      const makeRow = (p, rank, extraCls) => {
+        const tc = TEAM_CONFIG[p.team] || {};
+        const borderColor = tc.color || 'transparent';
+        const val = p.stats[col + '_raw'] || (p.stats[col] !== null ? p.stats[col] : '—');
+        const rankLabel = rank < 3 ? MEDALS[rank] : rank + 1;
+        return `
+          <div class="ldr-cr${extraCls}" style="border-left:3px solid ${borderColor}">
+            <span class="ldr-cr-rank${rank < 3 ? ' ldr-cr-medal' : ''}">${rankLabel}</span>
+            <span class="ldr-cr-name">${nameSpan(p.name, p.team)}</span>
+            <span class="ldr-cr-val">${val}</span>
+          </div>`;
+      };
 
-      const cells = Array.from({ length: colCount }, (_, ci) => {
-        const val = row[ci] || '';
-        if (ci === rankCol) {
-          return `<td class="ldr-td ldr-td-rank${isTop3 ? ' ldr-medal' : ''}">${rankDisplay}</td>`;
-        }
-        if (ci === teamCol) {
-          return `<td class="ldr-td ldr-td-team">${teamSpan(val)}</td>`;
-        }
-        const isBest = bestPerCol[ci] === ri;
-        const isNumericCol = ci > Math.max(rankCol, teamCol >= 0 ? teamCol : -1);
-        if (isNumericCol) {
-          return `<td class="ldr-td ldr-td-num${isBest ? ' ldr-best' : ''}">${val}</td>`;
-        }
-        return `<td class="ldr-td">${teamSpan(val)}</td>`;
-      }).join('');
+      const top3Html  = top3.map((p, i) => makeRow(p, i, ' ldr-cr-top')).join('');
+      const moreId    = `ldr-more-${cardIdx}`;
+      const restHtml  = rest.length
+        ? `<div class="ldr-more" id="${moreId}">${rest.map((p, i) => makeRow(p, i + 3, '')).join('')}</div>
+           <button class="ldr-more-btn" data-target="${moreId}">詳細 ▼</button>`
+        : '';
 
-      return `<tr style="${rowStyle}">${cells}</tr>`;
+      return `
+        <div class="ldr-card">
+          <div class="ldr-card-title">${label}</div>
+          ${top3Html}
+          ${restHtml}
+        </div>`;
     }).join('');
 
     return `
       <div class="label" style="margin-top:1.2rem">🏅 本季個人領先榜</div>
-      <div class="card" style="overflow:hidden;padding:0">
-        <div class="ldr-table-wrap">
-          <table class="ldr-table">
-            <thead><tr>${theadHtml}</tr></thead>
-            <tbody>${tbodyHtml}</tbody>
-          </table>
-        </div>
-      </div>`;
+      <div class="ldr-cards-grid">${cards}</div>`;
   }
 
-  /* ── 隊伍統計表 ── */
+  /* ════════════════════════════════
+     隊伍統計表（進攻/防守/差值）
+     ════════════════════════════════ */
   function renderTeamTable(emoji, title, section) {
     const { headers, rows } = section;
     if (!rows.length) return '';
 
     const colCount = Math.max(headers.length, ...rows.map(r => r.length));
 
-    // 找隊伍欄
     let teamCol = 0;
     for (let c = 0; c < colCount; c++) {
       if (rows.some(r => detectTeam(r[c]))) { teamCol = c; break; }
@@ -150,22 +169,25 @@
 
     const bestPerCol = findBestPerCol(rows, [teamCol]);
 
-    const theadHtml = headers.map((h, i) => {
-      const isNum = i !== teamCol;
-      return `<th class="ldr-th${isNum ? ' ldr-th-num' : ''}">${h}</th>`;
-    }).join('');
+    const theadHtml = headers.map((h, i) =>
+      `<th class="ldr-th${i !== teamCol ? ' ldr-th-num' : ''}">${h}</th>`
+    ).join('');
 
     const tbodyHtml = rows.map((row, ri) => {
       const team = detectTeam(row[teamCol]);
       const tc = team ? (TEAM_CONFIG[team] || {}) : {};
       const borderColor = tc.color || 'transparent';
-      const bgColor = tc.bg ? tc.bg.replace(/[\d.]+\)$/, '.08)') : '';
-      const rowStyle = `border-left:3px solid ${borderColor}${bgColor ? `;background:${bgColor}` : ''}`;
+      const bg = tc.bg ? tc.bg.replace(/[\d.]+\)$/, '.08)') : '';
+      const rowStyle = `border-left:3px solid ${borderColor}${bg ? `;background:${bg}` : ''}`;
 
       const cells = Array.from({ length: colCount }, (_, ci) => {
         const val = row[ci] || '';
         if (ci === teamCol) {
-          return `<td class="ldr-td ldr-td-team">${teamSpan(val)}</td>`;
+          const t2 = detectTeam(val);
+          const tc2 = t2 ? (TEAM_CONFIG[t2] || {}) : {};
+          const style2 = tc2.nameStyle ? ` style="${tc2.nameStyle}"` : '';
+          const span = t2 ? `<span class="${tc2.cls}"${style2}>${val}</span>` : val;
+          return `<td class="ldr-td ldr-td-team">${span}</td>`;
         }
         const isBest = bestPerCol[ci] === ri;
         return `<td class="ldr-td ldr-td-num${isBest ? ' ldr-best' : ''}">${val}</td>`;
@@ -208,6 +230,16 @@
 
       container.innerHTML = html ||
         '<div class="state-msg"><span>📋 尚無領先榜資料</span></div>';
+
+      // 展開/收合事件
+      container.addEventListener('click', e => {
+        const btn = e.target.closest('.ldr-more-btn');
+        if (!btn) return;
+        const moreEl = document.getElementById(btn.dataset.target);
+        if (!moreEl) return;
+        const isOpen = moreEl.classList.toggle('open');
+        btn.textContent = isOpen ? '收起 ▲' : '詳細 ▼';
+      });
     } catch (err) {
       console.error('載入領先榜失敗:', err);
       showError(container, '資料載入失敗，請稍後再試', 'loadLeaders');

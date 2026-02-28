@@ -1158,45 +1158,75 @@ body { padding-bottom: 64px; }
 /* ═══════════════════════════════════
    LEADERS PAGE STYLES
 ═══════════════════════════════════ */
+
+/* ── 個人領先榜：卡片格 ── */
+.ldr-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: .7rem; margin-bottom: .5rem;
+}
+.ldr-card {
+  background: #fff; border-radius: var(--r);
+  box-shadow: 0 2px 10px rgba(15,27,45,.07), 0 0 0 1px rgba(15,27,45,.05);
+  overflow: hidden;
+}
+.ldr-card-title {
+  font-family: var(--font-disp); font-size: .72rem; letter-spacing: .13em; text-transform: uppercase;
+  color: rgba(255,255,255,.65); background: var(--navy);
+  padding: .52rem 1rem .42rem;
+}
+
+/* 每一筆球員 row */
+.ldr-cr {
+  display: grid; grid-template-columns: 2rem 1fr auto;
+  align-items: center; gap: .3rem;
+  padding: .5rem .9rem; border-bottom: 1px solid var(--warm1);
+}
+.ldr-cr:last-child { border-bottom: none; }
+.ldr-cr-top { background: rgba(249,106,26,.03); }
+
+.ldr-cr-rank {
+  font-family: var(--font-cond); font-size: .8rem; font-weight: 800;
+  color: var(--txt-light); text-align: center; flex-shrink: 0;
+}
+.ldr-cr-rank.ldr-cr-medal { font-size: .88rem; }
+
+.ldr-cr-name { font-size: .88rem; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ldr-cr-val  { font-family: var(--font-disp); font-size: 1.1rem; letter-spacing: .03em; flex-shrink: 0; color: var(--txt-dark); }
+
+/* 展開區 */
+.ldr-more { display: none; }
+.ldr-more.open { display: block; }
+.ldr-more-btn {
+  display: block; width: 100%; padding: .4rem;
+  background: var(--warm1); border: none; border-top: 1px solid var(--warm2);
+  font-family: var(--font-cond); font-size: .76rem; font-weight: 800; letter-spacing: .06em;
+  color: var(--txt-light); cursor: pointer; transition: background .15s, color .15s;
+}
+.ldr-more-btn:hover { background: var(--warm2); color: var(--txt-dark); }
+
+/* ── 隊伍統計表 ── */
 .ldr-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .ldr-table { width: 100%; border-collapse: collapse; min-width: 340px; }
 
-/* 標題列 */
 .ldr-th {
   padding: .48rem .75rem; text-align: left; font-size: .7rem;
   font-family: var(--font-cond); font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
   background: var(--navy); color: rgba(255,255,255,.55); white-space: nowrap;
 }
-.ldr-th-rank { width: 40px; text-align: center; padding: .48rem .3rem; }
 .ldr-th-num  { text-align: right; }
 
-/* 資料列 */
 .ldr-td {
   padding: .52rem .75rem; font-size: .86rem;
   border-bottom: 1px solid var(--warm1); vertical-align: middle;
 }
 .ldr-table tbody tr:last-child .ldr-td { border-bottom: none; }
 
-/* 排名欄 */
-.ldr-td-rank {
-  text-align: center; font-family: var(--font-disp); font-size: .95rem;
-  color: var(--txt-light); padding: .52rem .3rem; width: 40px; letter-spacing: .02em;
-}
-.ldr-td-rank.ldr-medal { font-size: .95rem; }
-
-/* 球員名字欄 */
-.ldr-td-name { font-weight: 600; }
-
-/* 數字欄 */
 .ldr-td-num {
   text-align: right; font-family: var(--font-cond); font-size: .9rem;
   font-weight: 600; letter-spacing: .04em; white-space: nowrap; color: var(--txt-mid);
 }
-
-/* 隊伍名字欄 */
 .ldr-td-team { font-weight: 700; }
-
-/* 最佳值（欄內最高）*/
 .ldr-best { color: var(--orange); font-weight: 800; }
 
 /* ═══════════════════════════════════
