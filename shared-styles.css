@@ -1155,7 +1155,67 @@ body { padding-bottom: 64px; }
   letter-spacing: .06em; color: var(--txt-mid); text-align: center; flex: 1;
 }
 
+/* ═══════════════════════════════════
+   LEADERS PAGE STYLES
+═══════════════════════════════════ */
+.ldr-table-wrap { overflow-x: auto; }
+.ldr-table { width: 100%; border-collapse: collapse; min-width: 320px; }
+.ldr-th {
+  padding: .5rem .8rem; text-align: left; font-size: .72rem;
+  font-family: var(--font-cond); font-weight: 800; letter-spacing: .07em;
+  background: var(--warm1); color: var(--txt-mid); border-bottom: 2px solid var(--warm2);
+}
+.ldr-td {
+  padding: .5rem .8rem; font-size: .85rem;
+  border-bottom: 1px solid var(--warm1);
+}
+.ldr-table tbody tr:last-child .ldr-td { border-bottom: none; }
+.ldr-table tbody tr:hover { background: rgba(15,27,45,.03); }
+
+/* ═══════════════════════════════════
+   BOXSCORE: ESPN INSIGHTS STYLES
+═══════════════════════════════════ */
+.bsi-wrap { padding: 1rem; display: flex; flex-direction: column; gap: .75rem; }
+.bsi-section {
+  background: #fff; border-radius: var(--r-sm); overflow: hidden;
+  border: 1px solid var(--warm2);
+}
+.bsi-title {
+  font-family: var(--font-disp); font-size: .72rem; letter-spacing: .12em;
+  color: var(--txt-light); padding: .5rem 1rem .35rem; border-bottom: 1px solid var(--warm1);
+  text-transform: uppercase; background: var(--warm1);
+}
+
+/* Team Stats */
+.bsi-ts-table { width: 100%; border-collapse: collapse; }
+.bsi-ts-table tbody tr { border-bottom: 1px solid var(--warm1); }
+.bsi-ts-table tbody tr:last-child { border-bottom: none; }
+.bsi-th { padding: .5rem .9rem; font-size: .88rem; background: var(--warm1); text-align: center; border-bottom: 1px solid var(--warm2); }
+.bsi-th-mid { width: 44%; background: var(--warm1); border-bottom: 1px solid var(--warm2); }
+.bsi-val { width: 28%; text-align: center; padding: .38rem .7rem; font-size: .88rem; font-family: var(--font-cond); font-weight: 600; letter-spacing: .04em; }
+.bsi-val.bsi-win { font-weight: 900; color: var(--txt-dark); }
+.bsi-label { text-align: center; color: var(--txt-light); font-size: .76rem; padding: .38rem .2rem; font-family: var(--font-cond); letter-spacing: .03em; }
+
+/* Game Leaders */
+.bsi-ldr-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+.bsi-ldr-card { padding: .75rem 1rem; border-right: 1px solid var(--warm1); }
+.bsi-ldr-card:last-child { border-right: none; }
+.bsi-ldr-cat { font-size: .7rem; color: var(--txt-light); margin-bottom: .2rem; font-family: var(--font-cond); letter-spacing: .03em; }
+.bsi-ldr-name { font-size: .88rem; font-weight: 700; margin-bottom: .15rem; }
+.bsi-ldr-val { font-family: var(--font-disp); font-size: 1.5rem; line-height: 1; }
+.bsi-ldr-unit { font-size: .6rem; color: var(--txt-light); font-weight: 400; font-family: var(--font-body); }
+
+/* Season Series */
+.bsi-series-row { display: flex; align-items: center; gap: .5rem; padding: .8rem 1rem; }
+.bsi-series-team { text-align: center; min-width: 50px; }
+.bsi-series-wins { font-family: var(--font-disp); font-size: 2rem; line-height: 1; }
+.bsi-series-name { font-size: .72rem; color: var(--txt-light); margin-top: .15rem; }
+.bsi-series-mid { flex: 1; text-align: center; font-size: .82rem; color: var(--txt-mid); }
+
 @media (max-width: 480px) {
   .bs-gc-matchup { font-size: .92rem; }
   .bs-table { font-size: .78rem; min-width: 540px; }
+  .bsi-ldr-grid { grid-template-columns: 1fr; }
+  .bsi-ldr-card { border-right: none; border-bottom: 1px solid var(--warm1); }
+  .bsi-ldr-card:last-child { border-bottom: none; }
 }

@@ -23,6 +23,10 @@ const ApiConfig = {
     allRotation:  'datas!Q88:AC177',
     allMatchups:  'datas!D117:F206',
     boxscore:     'boxscore!A1:AO1980',
+    leadersTable: 'datas!D212:N224',
+    teamOffense:  'datas!D227:K234',
+    teamDefense:  'datas!D237:K244',
+    teamNet:      'datas!D247:K254',
   },
 
   /**
@@ -43,6 +47,7 @@ const ApiConfig = {
     dragon:    { file: 'dragon.json',    sheets: true  },
     rotation:  { file: 'rotation.json',  sheets: false },
     hof:       { file: 'hof.json',       sheets: false },
+    leaders:   { file: 'leaders.json',   sheets: true  },
     home:      { file: 'home.json',      sheets: true  },
     boxscore:  { file: 'boxscore.json',  sheets: true  },
   },
@@ -692,6 +697,24 @@ function transformHome(homeRows, standingsRows, dragonRows, allWeeks) {
   };
 }
 
+/* ── 轉換：領先榜 ── */
+function transformLeaders(tableRows, offRows, defRows, netRows) {
+  const parseSection = (rows) => {
+    if (!rows || !rows.length) return { headers: [], rows: [] };
+    const nonEmpty = rows.filter(r => r && r.some(c => c && String(c).trim()));
+    if (!nonEmpty.length) return { headers: [], rows: [] };
+    const headers = (nonEmpty[0] || []).map(h => String(h || '').trim());
+    const data = nonEmpty.slice(1).map(r => r.map(c => String(c || '').trim()));
+    return { headers, rows: data };
+  };
+  return {
+    leaders: parseSection(tableRows),
+    offense: parseSection(offRows),
+    defense: parseSection(defRows),
+    net:     parseSection(netRows),
+  };
+}
+
 /* ── 轉換：對戰數據（boxscore） ── */
 
 /**
@@ -966,6 +989,27 @@ const api = {
     } catch (err) {
       console.warn('[api] Sheets 取得 boxscore 失敗，回退靜態 JSON:', err.message);
       return fetchStatic('boxscore');
+    }
+  },
+
+  /** 領先榜 */
+  async getLeaders() {
+    if (!USE_SHEETS) return fetchStatic('leaders');
+    const cached = getCached('ep:leaders');
+    if (cached) return cached;
+    try {
+      const [tableRows, offRows, defRows, netRows] = await Promise.all([
+        fetchSheetsRange(ApiConfig.sheetsRanges.leadersTable),
+        fetchSheetsRange(ApiConfig.sheetsRanges.teamOffense),
+        fetchSheetsRange(ApiConfig.sheetsRanges.teamDefense),
+        fetchSheetsRange(ApiConfig.sheetsRanges.teamNet),
+      ]);
+      const data = transformLeaders(tableRows, offRows, defRows, netRows);
+      setCache('ep:leaders', data);
+      return data;
+    } catch (err) {
+      console.warn('[api] Sheets 取得領先榜失敗，回退靜態 JSON:', err.message);
+      return fetchStatic('leaders');
     }
   },
 

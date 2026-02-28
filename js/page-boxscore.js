@@ -166,6 +166,138 @@
   }
 
   /* ════════════════════════════════
+     ESPN-style: Team Stats
+     ════════════════════════════════ */
+  function fgPctStr(miss, made) {
+    const att = miss + made;
+    return att > 0 ? Math.round(made / att * 100) + '%' : '—';
+  }
+
+  function teamStatsHtml(game) {
+    const h = game.homeTot, a = game.awayTot;
+    const hc = TEAM_CONFIG[game.homeTeam] || {};
+    const ac = TEAM_CONFIG[game.awayTeam] || {};
+    const rows = [
+      { label: '兩分%',  hv: fgPctStr(h.fg2miss, h.fg2made), av: fgPctStr(a.fg2miss, a.fg2made), hRaw: h.fg2made / (h.fg2miss + h.fg2made || 1), aRaw: a.fg2made / (a.fg2miss + a.fg2made || 1) },
+      { label: '三分%',  hv: fgPctStr(h.fg3miss, h.fg3made), av: fgPctStr(a.fg3miss, a.fg3made), hRaw: h.fg3made / (h.fg3miss + h.fg3made || 1), aRaw: a.fg3made / (a.fg3miss + a.fg3made || 1) },
+      { label: '罰球%',  hv: fgPctStr(h.ftmiss,  h.ftmade),  av: fgPctStr(a.ftmiss,  a.ftmade),  hRaw: h.ftmade  / (h.ftmiss  + h.ftmade  || 1), aRaw: a.ftmade  / (a.ftmiss  + a.ftmade  || 1) },
+      { label: '得分',   hv: h.pts,  av: a.pts,  hRaw: h.pts,  aRaw: a.pts  },
+      { label: '籃板',   hv: h.treb, av: a.treb, hRaw: h.treb, aRaw: a.treb },
+      { label: '進攻板', hv: h.oreb, av: a.oreb, hRaw: h.oreb, aRaw: a.oreb },
+      { label: '防守板', hv: h.dreb, av: a.dreb, hRaw: h.dreb, aRaw: a.dreb },
+      { label: '助攻',   hv: h.ast,  av: a.ast,  hRaw: h.ast,  aRaw: a.ast  },
+      { label: '抄截',   hv: h.stl,  av: a.stl,  hRaw: h.stl,  aRaw: a.stl  },
+      { label: '阻攻',   hv: h.blk,  av: a.blk,  hRaw: h.blk,  aRaw: a.blk  },
+      { label: '失誤',   hv: h.tov,  av: a.tov,  hRaw: h.tov,  aRaw: a.tov,  lower: true },
+      { label: '犯規',   hv: h.pf,   av: a.pf,   hRaw: h.pf,   aRaw: a.pf,   lower: true },
+    ];
+    const rowsHtml = rows.map(({ label, hv, av, hRaw, aRaw, lower }) => {
+      const hBetter = lower ? hRaw < aRaw : hRaw > aRaw;
+      const aBetter = lower ? aRaw < hRaw : aRaw > hRaw;
+      return `<tr>
+        <td class="bsi-val${hBetter ? ' bsi-win' : ''}">${hv}</td>
+        <td class="bsi-label">${label}</td>
+        <td class="bsi-val${aBetter ? ' bsi-win' : ''}">${av}</td>
+      </tr>`;
+    }).join('');
+    return `
+      <div class="bsi-section">
+        <div class="bsi-title">Team Stats</div>
+        <table class="bsi-ts-table">
+          <thead><tr>
+            <th class="${hc.cls} bsi-th">${game.homeTeam}隊</th>
+            <th class="bsi-th-mid"></th>
+            <th class="${ac.cls} bsi-th">${game.awayTeam}隊</th>
+          </tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>`;
+  }
+
+  /* ════════════════════════════════
+     ESPN-style: Game Leaders
+     ════════════════════════════════ */
+  function gameLeadersHtml(game) {
+    const all = [
+      ...game.homePlayers.filter(p => p.played),
+      ...game.awayPlayers.filter(p => p.played),
+    ];
+    if (!all.length) return '';
+    const topBy = key => all.reduce((best, p) => (!best || p[key] > best[key]) ? p : best, null);
+    const topPts = topBy('pts');
+    const topReb = topBy('treb');
+    const topAst = topBy('ast');
+
+    const card = (icon, label, player, key, unit) => {
+      if (!player) return '';
+      const tc = TEAM_CONFIG[player.team] || {};
+      const style = tc.nameStyle ? ` style="${tc.nameStyle}"` : '';
+      return `
+        <div class="bsi-ldr-card">
+          <div class="bsi-ldr-cat">${icon} ${label}</div>
+          <div class="bsi-ldr-name"><span class="${tc.cls}"${style}>${player.name}</span></div>
+          <div class="bsi-ldr-val">${player[key]}<span class="bsi-ldr-unit"> ${unit}</span></div>
+        </div>`;
+    };
+
+    return `
+      <div class="bsi-section">
+        <div class="bsi-title">Game Leaders</div>
+        <div class="bsi-ldr-grid">
+          ${card('🏀', '得分', topPts, 'pts', 'pts')}
+          ${card('💪', '籃板', topReb, 'treb', 'reb')}
+          ${card('🎯', '助攻', topAst, 'ast', 'ast')}
+        </div>
+      </div>`;
+  }
+
+  /* ════════════════════════════════
+     ESPN-style: Season Series
+     ════════════════════════════════ */
+  function computeH2H(homeTeam, awayTeam) {
+    let homeWins = 0, awayWins = 0;
+    if (!_data || !_data.weeks) return { homeWins, awayWins };
+    for (const wk of _data.weeks) {
+      for (const g of wk.games) {
+        if (!g.hasScores) continue;
+        if (g.homeTeam === homeTeam && g.awayTeam === awayTeam) {
+          g.homeScore > g.awayScore ? homeWins++ : awayWins++;
+        } else if (g.homeTeam === awayTeam && g.awayTeam === homeTeam) {
+          g.homeScore > g.awayScore ? awayWins++ : homeWins++;
+        }
+      }
+    }
+    return { homeWins, awayWins };
+  }
+
+  function seasonSeriesHtml(homeTeam, awayTeam) {
+    const { homeWins, awayWins } = computeH2H(homeTeam, awayTeam);
+    if (homeWins + awayWins === 0) return '';
+    const hc = TEAM_CONFIG[homeTeam] || {};
+    const ac = TEAM_CONFIG[awayTeam] || {};
+    const leading = homeWins > awayWins ? homeTeam : awayWins > homeWins ? awayTeam : null;
+    const ltc = leading ? (TEAM_CONFIG[leading] || {}) : {};
+    const seriesLabel = leading
+      ? `<span class="${ltc.cls}">${leading}隊</span>本季領先`
+      : '本季平局';
+    return `
+      <div class="bsi-section">
+        <div class="bsi-title">Season Series</div>
+        <div class="bsi-series-row">
+          <div class="bsi-series-team">
+            <div class="bsi-series-wins ${hc.cls}">${homeWins}</div>
+            <div class="bsi-series-name ${hc.cls}">${homeTeam}隊</div>
+          </div>
+          <div class="bsi-series-mid">${seriesLabel}</div>
+          <div class="bsi-series-team">
+            <div class="bsi-series-wins ${ac.cls}">${awayWins}</div>
+            <div class="bsi-series-name ${ac.cls}">${awayTeam}隊</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  /* ════════════════════════════════
      渲染展開的 boxscore 內容
      ════════════════════════════════ */
   function renderGameBody(game, bodyEl) {
@@ -176,8 +308,16 @@
       ? `<div class="bs-recorder">📝 記錄：${game.recorder}</div>`
       : '';
 
+    const insightsHtml = game.hasScores ? `
+      <div class="bsi-wrap">
+        ${teamStatsHtml(game)}
+        ${gameLeadersHtml(game)}
+        ${seasonSeriesHtml(game.homeTeam, game.awayTeam)}
+      </div>` : '';
+
     bodyEl.innerHTML = `
       ${recorderHtml}
+      ${insightsHtml}
       ${teamBoxHtml(game.homeTeam, game.homePlayers, game.homeTot, game.homeScore, true)}
       <div class="bs-divider"></div>
       ${teamBoxHtml(game.awayTeam, game.awayPlayers, game.awayTot, game.awayScore, false)}`;
