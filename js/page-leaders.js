@@ -14,27 +14,29 @@
     return isNaN(n) ? null : n;
   }
 
-  /* 從儲存格辨識隊名（支援 "黃", "黃隊", "黃偉訓(黃)" 格式） */
+  /* 從儲存格辨識隊名（支援 "黃", "黃隊", "黃偉訓(黃)", "黃偉訓(黃隊)" 格式） */
   function detectTeam(cell) {
     if (!cell) return null;
     const s = String(cell).trim();
-    if (TEAM_CONFIG[s.replace(/隊$/, '')]) return s.replace(/隊$/, '');
+    const norm = s.replace(/隊$/, '');
+    if (TEAM_CONFIG[norm]) return norm;
     const m = s.match(/\(([^)]+)\)?$/);
-    if (m && TEAM_CONFIG[m[1].trim()]) return m[1].trim();
+    if (m) {
+      const raw = m[1].trim();
+      const normRaw = raw.replace(/隊$/, '');
+      if (TEAM_CONFIG[normRaw]) return normRaw;
+      if (TEAM_CONFIG[raw]) return raw;
+    }
     return null;
   }
 
-  /* 解析球員姓名 + 隊伍，並去掉 "(X)" 後綴 */
+  /* 解析球員姓名 + 隊伍：把 "(" 及右方字串全部去掉 */
   function parsePlayer(cell) {
     if (!cell) return { name: '', team: '' };
     const s = String(cell).trim();
-    const m = s.match(/^(.+?)\(([^)]*)\)?$/);
-    if (m) {
-      const name = m[1].trim();
-      const raw  = m[2].trim();
-      if (TEAM_CONFIG[raw]) return { name, team: raw };
-    }
-    return { name: s, team: detectTeam(s) || '' };
+    const name = s.replace(/\(.*$/, '').trim();
+    const team = detectTeam(s) || '';
+    return { name: name || s, team };
   }
 
   /* 名字 span（套隊伍色） */
@@ -63,79 +65,72 @@
   }
 
   /* ════════════════════════════════
-     個人領先榜 — 11 個方塊
+     個人領先榜 — 每行一種數據類別
+     Sheets 格式：
+       row[0] = ["", "1", "2", ... "10"]      ← 排名
+       row[1] = ["平均得分", "姓名(隊\n數值", ...]
+       row[2] = ["平均籃板", "姓名(隊\n數值", ...]
+     每格 = "球員名(隊色\n數值"
      ════════════════════════════════ */
   function renderIndividualLeaders(section) {
-    const { headers, rows } = section;
-    if (!rows.length || !headers.length) return '';
+    const { rows } = section;
+    if (!rows || !rows.length) return '';
 
-    const colCount = Math.max(headers.length, ...rows.map(r => r.length));
+    /* 跳過排名列（第一列全為數字 1,2,3…） */
+    const statRows = rows.filter(row => {
+      const label = (row[0] || '').trim();
+      if (!label) return false;
+      /* 排名列：row[0] 為空，row[1..] 為 1,2,3… */
+      return !/^\d+$/.test(label);
+    });
 
-    // 自動偵測各欄角色
-    let rankCol = -1, nameCol = -1;
+    if (!statRows.length) return '';
 
-    for (let c = 0; c < colCount; c++) {
-      const vals = rows.slice(0, Math.min(4, rows.length)).map(r => (r[c] || '').trim());
-      if (rankCol < 0 && vals.every((v, i) => parseInt(v) === i + 1)) {
-        rankCol = c; continue;
-      }
-      if (nameCol < 0 && vals.some(v => /\([^)]+\)$/.test(v) && detectTeam(v))) {
-        nameCol = c;
-      }
+    /* 解析單一 cell："姓名(隊色\n數值" */
+    function parseCell(cell) {
+      if (!cell) return null;
+      const s = String(cell).trim();
+      if (!s) return null;
+      const lines = s.split('\n');
+      const nameTeam = (lines[0] || '').trim();
+      const val = lines.length > 1 ? (lines[1] || '').trim() : '';
+      if (!nameTeam) return null;
+      const name = nameTeam.replace(/\(.*$/, '').trim();
+      const team = detectTeam(nameTeam) || '';
+      return { name, team, val };
     }
 
-    // 統計欄（排除排名欄、名字欄）
-    const statCols = [];
-    for (let c = 0; c < colCount; c++) {
-      if (c === rankCol || c === nameCol) continue;
-      const h = (headers[c] || '').trim();
-      if (!h) continue;
-      const vals = rows.map(r => (r[c] || '').trim()).filter(Boolean);
-      if (vals.length && vals.some(v => asNum(v) !== null)) {
-        statCols.push({ col: c, label: h });
-      }
-    }
-
-    if (!statCols.length) return '';
-
-    // 解析所有球員
-    const players = rows.map(row => {
-      const cell = nameCol >= 0 ? (row[nameCol] || '') : '';
-      const { name, team } = parsePlayer(cell);
-      const stats = {};
-      statCols.forEach(({ col }) => {
-        stats[col] = asNum(row[col]);
-        stats[col + '_raw'] = (row[col] || '').trim();
-      });
-      return { name, team, stats };
-    }).filter(p => p.name);
-
-    // 11 個方塊
     const MEDALS = ['🥇', '🥈', '🥉'];
-    const cards = statCols.map(({ col, label }, cardIdx) => {
-      const sorted = [...players]
-        .filter(p => p.stats[col] !== null)
-        .sort((a, b) => (b.stats[col] || 0) - (a.stats[col] || 0));
 
-      const top3 = sorted.slice(0, 3);
-      const rest = sorted.slice(3);
+    const cards = statRows.map((row, cardIdx) => {
+      const label = (row[0] || '').trim();
+
+      /* 解析排名球員（col 1 起） */
+      const players = [];
+      for (let c = 1; c < row.length; c++) {
+        const p = parseCell(row[c]);
+        if (p) players.push(p);
+      }
+      if (!players.length) return '';
+
+      const top3 = players.slice(0, 3);
+      const rest = players.slice(3);
 
       const makeRow = (p, rank, extraCls) => {
         const tc = TEAM_CONFIG[p.team] || {};
         const borderColor = tc.color || 'transparent';
-        const val = p.stats[col + '_raw'] || (p.stats[col] !== null ? p.stats[col] : '—');
         const rankLabel = rank < 3 ? MEDALS[rank] : rank + 1;
         return `
           <div class="ldr-cr${extraCls}" style="border-left:3px solid ${borderColor}">
             <span class="ldr-cr-rank${rank < 3 ? ' ldr-cr-medal' : ''}">${rankLabel}</span>
             <span class="ldr-cr-name">${nameSpan(p.name, p.team)}</span>
-            <span class="ldr-cr-val">${val}</span>
+            <span class="ldr-cr-val">${p.val || '—'}</span>
           </div>`;
       };
 
-      const top3Html  = top3.map((p, i) => makeRow(p, i, ' ldr-cr-top')).join('');
-      const moreId    = `ldr-more-${cardIdx}`;
-      const restHtml  = rest.length
+      const top3Html = top3.map((p, i) => makeRow(p, i, ' ldr-cr-top')).join('');
+      const moreId = `ldr-more-${cardIdx}`;
+      const restHtml = rest.length
         ? `<div class="ldr-more" id="${moreId}">${rest.map((p, i) => makeRow(p, i + 3, '')).join('')}</div>
            <button class="ldr-more-btn" data-target="${moreId}">詳細 ▼</button>`
         : '';
@@ -146,7 +141,7 @@
           ${top3Html}
           ${restHtml}
         </div>`;
-    }).join('');
+    }).filter(Boolean).join('');
 
     return `
       <div class="label" style="margin-top:1.2rem">🏅 本季個人領先榜</div>
