@@ -45,7 +45,7 @@
           <div class="gc-head">
             <div class="gc-stripe"></div>
             <div class="gc-num">GAME ${game.num}</div>
-            <div class="gc-teams" style="color:var(--txt-light)">尚未安排</div>
+            <div class="gc-teams" style="justify-content:center;color:var(--txt-light);font-size:.85rem">尚未安排</div>
           </div>
         </div>`;
     }
@@ -57,12 +57,7 @@
     const homeWin = isFinished && game.homeScore > game.awayScore;
     const awayWin = isFinished && game.awayScore > game.homeScore;
 
-    let scoreSection;
-    if (isFinished) {
-      scoreSection = `<div class="gc-score">${gameScoreHtml(game)}</div>`;
-    } else {
-      scoreSection = '<div class="gc-score pending">尚未開打</div>';
-    }
+    const scoreMidHtml = isFinished ? gameScoreHtml(game) : '';
 
     let staffHtml = '';
     if (game.staff && Object.keys(game.staff).length) {
@@ -79,8 +74,8 @@
       }).join('');
     }
 
-    const bsLink = (isFinished && phase && weekNum && game.num)
-      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&relweek=${weekNum}&game=${game.num}" class="bs-link-btn">📊 查看對戰數據</a>`
+    const bsBtn = (isFinished && phase && weekNum && game.num)
+      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&relweek=${weekNum}&game=${game.num}" class="gc-bs-btn">📊</a>`
       : '';
 
     // 有比分(finished) → 全部收合；沒比分(upcoming) → 全部展開
@@ -90,14 +85,18 @@
           <div class="gc-stripe"></div>
           <div class="gc-num">GAME ${game.num}${game.time ? ' · ' + game.time : ''}</div>
           <div class="gc-teams">
-            ${homeWin ? '<span class="gc-win">👑</span>' : ''}<span class="dot ${hc.dot}"></span><span class="${hc.cls}">${game.home}</span>
-            <span class="gc-sep">VS</span>
-            ${awayWin ? '<span class="gc-win">👑</span>' : ''}<span class="dot ${ac.dot}"></span><span class="${ac.cls}">${game.away}</span>
+            <span class="gc-crown">${homeWin ? '👑' : ''}</span>
+            <span class="dot ${hc.dot}"></span>
+            <span class="${hc.cls} gc-tname-h">${game.home}</span>
+            <div class="gc-score-mid">${scoreMidHtml}</div>
+            <span class="${ac.cls} gc-tname-a">${game.away}</span>
+            <span class="dot ${ac.dot}"></span>
+            <span class="gc-crown">${awayWin ? '👑' : ''}</span>
           </div>
-          ${scoreSection}
+          ${bsBtn}
           <div class="gc-arr">▼</div>
         </div>
-        <div class="gc-body">${staffHtml}${bsLink}</div>
+        <div class="gc-body">${staffHtml}</div>
       </div>`;
   }
 
@@ -399,6 +398,7 @@
     const schedGames = document.getElementById('sched-games');
     if (schedGames) {
       schedGames.addEventListener('click', (e) => {
+        if (e.target.closest('a')) return;
         const card = e.target.closest('.game-card');
         if (card) toggleCard(card);
       });

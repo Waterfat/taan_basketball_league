@@ -490,20 +490,29 @@ body { padding-bottom: 64px; }
 .game-card:hover { box-shadow: 0 4px 20px rgba(15,27,45,.12), 0 0 0 1px rgba(15,27,45,.06); }
 .game-card.open { box-shadow: 0 4px 20px rgba(249,106,26,.12), 0 0 0 1.5px rgba(249,106,26,.3); }
 .gc-head {
-  display: flex; align-items: center; gap: 1rem;
-  padding: .95rem 1.25rem; cursor: pointer; position: relative;
+  display: flex; align-items: center; gap: .55rem;
+  padding: .85rem 1.1rem .85rem 1.25rem; cursor: pointer; position: relative;
 }
 .gc-stripe {
   position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
   background: var(--warm2); border-radius: 4px 0 0 4px; transition: background .2s;
 }
 .game-card.open .gc-stripe { background: linear-gradient(180deg, var(--orange), var(--orange2)); }
-.gc-num { font-family: var(--font-disp); font-size: .72rem; letter-spacing: .1em; color: var(--txt-light); min-width: 52px; padding-left: .5rem; }
-.gc-teams { flex:1; display:flex; align-items:center; gap:.6rem; font-family:var(--font-disp); font-size:1.2rem; letter-spacing:.04em; color:var(--txt-dark); }
-.gc-sep { font-size:.6rem; color:var(--txt-light); }
-.gc-score { font-family:var(--font-disp); font-size:1.3rem; letter-spacing:.04em; min-width:80px; text-align:center; }
-.gc-score.pending { font-size:.75rem; font-family:var(--font-cond); color:var(--txt-light); font-weight:700; letter-spacing:.06em; }
-.gc-arr { color:var(--txt-light); font-size:.7rem; transition:transform .25s; }
+.gc-num { font-family: var(--font-disp); font-size: .72rem; letter-spacing: .1em; color: var(--txt-light); min-width: 52px; padding-left: .5rem; flex-shrink: 0; }
+.gc-teams { flex: 1; display: flex; align-items: center; gap: .3rem; font-family: var(--font-disp); font-size: 1.1rem; letter-spacing: .04em; color: var(--txt-dark); min-width: 0; }
+.gc-crown { width: 1.15em; text-align: center; flex-shrink: 0; font-size: .85rem; }
+.gc-tname-h { flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.gc-tname-a { flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.gc-score-mid { flex-shrink: 0; text-align: center; min-width: 70px; font-family: var(--font-disp); font-size: 1.2rem; letter-spacing: .04em; }
+.gc-bs-btn {
+  flex-shrink: 0; display: inline-flex; align-items: center;
+  padding: .18rem .42rem; font-size: .78rem; text-decoration: none;
+  color: var(--txt-light); border-radius: var(--r-sm);
+  border: 1px solid var(--warm2); background: var(--warm1);
+  transition: color .15s, background .15s;
+}
+.gc-bs-btn:hover { background: var(--warm2); color: var(--txt-dark); }
+.gc-arr { color:var(--txt-light); font-size:.7rem; transition:transform .25s; flex-shrink: 0; }
 .game-card.open .gc-arr { transform:rotate(180deg); color:var(--orange); }
 .gc-body {
   display:none; padding: 0 1.25rem 1rem 1.7rem; border-top: 1px solid var(--warm1);
