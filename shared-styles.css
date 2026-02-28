@@ -1158,19 +1158,46 @@ body { padding-bottom: 64px; }
 /* ═══════════════════════════════════
    LEADERS PAGE STYLES
 ═══════════════════════════════════ */
-.ldr-table-wrap { overflow-x: auto; }
-.ldr-table { width: 100%; border-collapse: collapse; min-width: 320px; }
+.ldr-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ldr-table { width: 100%; border-collapse: collapse; min-width: 340px; }
+
+/* 標題列 */
 .ldr-th {
-  padding: .5rem .8rem; text-align: left; font-size: .72rem;
-  font-family: var(--font-cond); font-weight: 800; letter-spacing: .07em;
-  background: var(--warm1); color: var(--txt-mid); border-bottom: 2px solid var(--warm2);
+  padding: .48rem .75rem; text-align: left; font-size: .7rem;
+  font-family: var(--font-cond); font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+  background: var(--navy); color: rgba(255,255,255,.55); white-space: nowrap;
 }
+.ldr-th-rank { width: 40px; text-align: center; padding: .48rem .3rem; }
+.ldr-th-num  { text-align: right; }
+
+/* 資料列 */
 .ldr-td {
-  padding: .5rem .8rem; font-size: .85rem;
-  border-bottom: 1px solid var(--warm1);
+  padding: .52rem .75rem; font-size: .86rem;
+  border-bottom: 1px solid var(--warm1); vertical-align: middle;
 }
 .ldr-table tbody tr:last-child .ldr-td { border-bottom: none; }
-.ldr-table tbody tr:hover { background: rgba(15,27,45,.03); }
+
+/* 排名欄 */
+.ldr-td-rank {
+  text-align: center; font-family: var(--font-disp); font-size: .95rem;
+  color: var(--txt-light); padding: .52rem .3rem; width: 40px; letter-spacing: .02em;
+}
+.ldr-td-rank.ldr-medal { font-size: .95rem; }
+
+/* 球員名字欄 */
+.ldr-td-name { font-weight: 600; }
+
+/* 數字欄 */
+.ldr-td-num {
+  text-align: right; font-family: var(--font-cond); font-size: .9rem;
+  font-weight: 600; letter-spacing: .04em; white-space: nowrap; color: var(--txt-mid);
+}
+
+/* 隊伍名字欄 */
+.ldr-td-team { font-weight: 700; }
+
+/* 最佳值（欄內最高）*/
+.ldr-best { color: var(--orange); font-weight: 800; }
 
 /* ═══════════════════════════════════
    BOXSCORE: ESPN INSIGHTS STYLES
@@ -1193,17 +1220,21 @@ body { padding-bottom: 64px; }
 .bsi-th { padding: .5rem .9rem; font-size: .88rem; background: var(--warm1); text-align: center; border-bottom: 1px solid var(--warm2); }
 .bsi-th-mid { width: 44%; background: var(--warm1); border-bottom: 1px solid var(--warm2); }
 .bsi-val { width: 28%; text-align: center; padding: .38rem .7rem; font-size: .88rem; font-family: var(--font-cond); font-weight: 600; letter-spacing: .04em; }
-.bsi-val.bsi-win { font-weight: 900; color: var(--txt-dark); }
+.bsi-val.bsi-win { color: var(--orange); }
 .bsi-label { text-align: center; color: var(--txt-light); font-size: .76rem; padding: .38rem .2rem; font-family: var(--font-cond); letter-spacing: .03em; }
 
 /* Game Leaders */
-.bsi-ldr-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
-.bsi-ldr-card { padding: .75rem 1rem; border-right: 1px solid var(--warm1); }
-.bsi-ldr-card:last-child { border-right: none; }
-.bsi-ldr-cat { font-size: .7rem; color: var(--txt-light); margin-bottom: .2rem; font-family: var(--font-cond); letter-spacing: .03em; }
-.bsi-ldr-name { font-size: .88rem; font-weight: 700; margin-bottom: .15rem; }
-.bsi-ldr-val { font-family: var(--font-disp); font-size: 1.5rem; line-height: 1; }
-.bsi-ldr-unit { font-size: .6rem; color: var(--txt-light); font-weight: 400; font-family: var(--font-body); }
+.bsi-ldr-list { display: flex; flex-direction: column; }
+.bsi-ldr-row {
+  display: grid; grid-template-columns: 5.5rem 1fr auto;
+  align-items: center; gap: .5rem;
+  padding: .55rem 1rem; border-bottom: 1px solid var(--warm1);
+}
+.bsi-ldr-row:last-child { border-bottom: none; }
+.bsi-ldr-cat { font-size: .74rem; color: var(--txt-light); font-family: var(--font-cond); letter-spacing: .04em; }
+.bsi-ldr-name { font-size: .9rem; font-weight: 600; }
+.bsi-ldr-val { font-family: var(--font-disp); font-size: 1.4rem; line-height: 1; text-align: right; }
+.bsi-ldr-unit { font-size: .55rem; color: var(--txt-light); font-weight: 400; font-family: var(--font-body); }
 
 /* Season Series */
 .bsi-series-row { display: flex; align-items: center; gap: .5rem; padding: .8rem 1rem; }
@@ -1215,7 +1246,5 @@ body { padding-bottom: 64px; }
 @media (max-width: 480px) {
   .bs-gc-matchup { font-size: .92rem; }
   .bs-table { font-size: .78rem; min-width: 540px; }
-  .bsi-ldr-grid { grid-template-columns: 1fr; }
-  .bsi-ldr-card { border-right: none; border-bottom: 1px solid var(--warm1); }
-  .bsi-ldr-card:last-child { border-bottom: none; }
+  .bsi-ldr-row { grid-template-columns: 4.5rem 1fr auto; }
 }

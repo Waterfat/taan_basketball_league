@@ -202,7 +202,7 @@
     }).join('');
     return `
       <div class="bsi-section">
-        <div class="bsi-title">Team Stats</div>
+        <div class="bsi-title">隊伍數據</div>
         <table class="bsi-ts-table">
           <thead><tr>
             <th class="${hc.cls} bsi-th">${game.homeTeam}隊</th>
@@ -224,30 +224,32 @@
     ];
     if (!all.length) return '';
     const topBy = key => all.reduce((best, p) => (!best || p[key] > best[key]) ? p : best, null);
-    const topPts = topBy('pts');
-    const topReb = topBy('treb');
-    const topAst = topBy('ast');
 
-    const card = (icon, label, player, key, unit) => {
-      if (!player) return '';
+    const row = (icon, label, player, key, unit) => {
+      if (!player || player[key] === 0) return '';
       const tc = TEAM_CONFIG[player.team] || {};
       const style = tc.nameStyle ? ` style="${tc.nameStyle}"` : '';
       return `
-        <div class="bsi-ldr-card">
+        <div class="bsi-ldr-row">
           <div class="bsi-ldr-cat">${icon} ${label}</div>
           <div class="bsi-ldr-name"><span class="${tc.cls}"${style}>${player.name}</span></div>
           <div class="bsi-ldr-val">${player[key]}<span class="bsi-ldr-unit"> ${unit}</span></div>
         </div>`;
     };
 
+    const rows = [
+      row('🏀', '得分', topBy('pts'),  'pts',  'pts'),
+      row('💪', '籃板', topBy('treb'), 'treb', 'reb'),
+      row('🎯', '助攻', topBy('ast'),  'ast',  'ast'),
+      row('🤚', '抄截', topBy('stl'),  'stl',  'stl'),
+      row('🛡️', '阻攻', topBy('blk'),  'blk',  'blk'),
+    ].filter(Boolean).join('');
+
+    if (!rows) return '';
     return `
       <div class="bsi-section">
-        <div class="bsi-title">Game Leaders</div>
-        <div class="bsi-ldr-grid">
-          ${card('🏀', '得分', topPts, 'pts', 'pts')}
-          ${card('💪', '籃板', topReb, 'treb', 'reb')}
-          ${card('🎯', '助攻', topAst, 'ast', 'ast')}
-        </div>
+        <div class="bsi-title">場次最佳</div>
+        <div class="bsi-ldr-list">${rows}</div>
       </div>`;
   }
 
@@ -282,7 +284,7 @@
       : '本季平局';
     return `
       <div class="bsi-section">
-        <div class="bsi-title">Season Series</div>
+        <div class="bsi-title">本季對戰</div>
         <div class="bsi-series-row">
           <div class="bsi-series-team">
             <div class="bsi-series-wins ${hc.cls}">${homeWins}</div>
@@ -317,10 +319,10 @@
 
     bodyEl.innerHTML = `
       ${recorderHtml}
-      ${insightsHtml}
       ${teamBoxHtml(game.homeTeam, game.homePlayers, game.homeTot, game.homeScore, true)}
       <div class="bs-divider"></div>
-      ${teamBoxHtml(game.awayTeam, game.awayPlayers, game.awayTot, game.awayScore, false)}`;
+      ${teamBoxHtml(game.awayTeam, game.awayPlayers, game.awayTot, game.awayScore, false)}
+      ${insightsHtml}`;
   }
 
   /* ════════════════════════════════
