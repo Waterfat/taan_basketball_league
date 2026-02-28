@@ -85,13 +85,11 @@
           <div class="gc-stripe"></div>
           <div class="gc-num">GAME ${game.num}${game.time ? ' · ' + game.time : ''}</div>
           <div class="gc-teams">
-            <span class="gc-crown">${homeWin ? '👑' : ''}</span>
-            <span class="dot ${hc.dot}"></span>
             <span class="${hc.cls} gc-tname-h">${game.home}</span>
+            <span class="gc-crown">${homeWin ? '👑' : ''}</span>
             <div class="gc-score-mid">${scoreMidHtml}</div>
-            <span class="${ac.cls} gc-tname-a">${game.away}</span>
-            <span class="dot ${ac.dot}"></span>
             <span class="gc-crown">${awayWin ? '👑' : ''}</span>
+            <span class="${ac.cls} gc-tname-a">${game.away}</span>
           </div>
           ${bsBtn}
           <div class="gc-arr">▼</div>
