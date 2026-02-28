@@ -80,7 +80,7 @@
     }
 
     const bsLink = (isFinished && phase && weekNum && game.num)
-      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&week=${weekNum}&game=${game.num}" class="bs-link-btn">📊 查看對戰數據</a>`
+      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&relweek=${weekNum}&game=${game.num}" class="bs-link-btn">📊 查看對戰數據</a>`
       : '';
 
     // 有比分(finished) → 全部收合；沒比分(upcoming) → 全部展開
@@ -149,7 +149,8 @@
       showEmpty(container, '本週尚無賽程資料');
       return;
     }
-    container.innerHTML = weekData.games.map(g => buildSchedGameCard(g, weekData.phase, weekData.week)).join('');
+    const relWeek = getPhaseRelativeWeekNum(weekData);
+    container.innerHTML = weekData.games.map(g => buildSchedGameCard(g, weekData.phase, relWeek)).join('');
   }
 
   function renderScheduleMatchups(weekData) {
@@ -362,9 +363,22 @@
     }
   }
 
+  function getPhaseRelativeWeekNum(entry) {
+    let minWeek = entry.week;
+    if (_schedule && _schedule.allWeeks) {
+      for (const w of _schedule.allWeeks) {
+        if (w.type === 'game' && w.phase === entry.phase && w.week < minWeek) {
+          minWeek = w.week;
+        }
+      }
+    }
+    return entry.week - minWeek + 1;
+  }
+
   // 暴露全域（供跨模組使用）
   window.loadSchedule = loadSchedule;
   window.getPhaseWeekLabel = getPhaseWeekLabel;
+  window.getPhaseRelativeWeekNum = getPhaseRelativeWeekNum;
 
   // 事件綁定（取代 inline onclick）
   document.addEventListener('DOMContentLoaded', () => {

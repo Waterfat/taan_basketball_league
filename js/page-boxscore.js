@@ -287,12 +287,14 @@
 
       // 檢查 URL 深層連結
       const params = new URLSearchParams(location.search);
-      const dlPhase = params.get('phase');
-      const dlWeek  = parseInt(params.get('week'))  || 0;
-      const dlGame  = parseInt(params.get('game'))  || 0;
+      const dlPhase   = params.get('phase');
+      const dlRelWeek = parseInt(params.get('relweek')) || 0;
+      const dlGame    = parseInt(params.get('game'))    || 0;
 
-      if (dlPhase && dlWeek) {
-        const idx = _data.weeks.findIndex(w => w.phase === dlPhase && w.weekNum === dlWeek);
+      if (dlPhase && dlRelWeek) {
+        const idx = _data.weeks.findIndex(w =>
+          w.phase === dlPhase && getPhaseRelativeWeek(w) === dlRelWeek
+        );
         _wkIdx = idx >= 0 ? idx : _data.defaultIdx;
       } else {
         _wkIdx = _data.defaultIdx;
@@ -301,7 +303,7 @@
       renderWeekView();
 
       // 自動展開指定場次
-      if (dlGame && dlPhase && dlWeek) {
+      if (dlGame && dlPhase && dlRelWeek) {
         requestAnimationFrame(() => {
           const wk = _data.weeks[_wkIdx];
           if (!wk) return;

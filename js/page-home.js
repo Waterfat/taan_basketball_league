@@ -175,7 +175,7 @@
     }
 
     const bsLink = (isFinished && phase && weekNum && game.num)
-      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&week=${weekNum}&game=${game.num}" class="bs-link-btn">📊 查看對戰數據</a>`
+      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&relweek=${weekNum}&game=${game.num}" class="bs-link-btn">📊 查看對戰數據</a>`
       : '';
 
     return `
@@ -213,7 +213,8 @@
       matchupGrid.innerHTML = weekData.matchups.map(buildHomeMatchupCard).join('');
     }
     if (orderGrid && weekData.games) {
-      orderGrid.innerHTML = weekData.games.map(g => buildHomeGameCard(g, weekData.phase, weekData.week)).join('');
+      const relWeek = typeof getPhaseRelativeWeekNum === 'function' ? getPhaseRelativeWeekNum(weekData) : weekData.week;
+      orderGrid.innerHTML = weekData.games.map(g => buildHomeGameCard(g, weekData.phase, relWeek)).join('');
       const hint = document.getElementById('home-order-hint');
       if (hint) hint.style.display = 'block';
     }
