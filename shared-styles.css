@@ -1073,7 +1073,7 @@ body { padding-bottom: 64px; }
 .bs-table {
   width: 100%; border-collapse: collapse;
   font-family: var(--font-cond); font-size: .82rem;
-  min-width: 520px;
+  min-width: 600px;
 }
 .bs-table th {
   font-size: .6rem; font-weight: 800; letter-spacing: .1em;
@@ -1108,10 +1108,38 @@ body { padding-bottom: 64px; }
 }
 .bs-tot-row .bs-td-name { font-family: var(--font-cond); font-size: .78rem; color: var(--txt-mid); }
 
-.bs-sub {
-  display: block; font-size: .58rem; color: var(--txt-light);
-  margin-top: .05rem; letter-spacing: 0;
+.bs-paren {
+  font-size: .68rem; color: var(--txt-light); letter-spacing: 0;
 }
+.bs-pct {
+  font-size: .68rem; color: var(--txt-light); letter-spacing: 0;
+}
+
+.bs-recorder {
+  padding: .55rem .9rem .35rem;
+  font-family: var(--font-cond); font-size: .75rem; color: var(--txt-light);
+  border-bottom: 1px solid var(--warm1);
+}
+
+.bs-warn-banner {
+  margin-bottom: .6rem;
+  padding: .6rem 1rem;
+  background: rgba(229,57,53,.07); border: 1px solid rgba(229,57,53,.2);
+  border-radius: var(--r-sm);
+  font-family: var(--font-cond); font-size: .82rem;
+  color: #c0392b; font-weight: 700; letter-spacing: .02em;
+}
+
+.bs-link-btn {
+  display: inline-block; margin: .5rem .9rem .7rem;
+  padding: .38rem .85rem;
+  background: var(--warm1); border: 1px solid var(--warm2);
+  border-radius: var(--r-sm);
+  font-family: var(--font-cond); font-size: .78rem; font-weight: 700;
+  color: var(--txt-mid); text-decoration: none; letter-spacing: .03em;
+  transition: background .15s, color .15s;
+}
+.bs-link-btn:hover { background: var(--warm2); color: var(--txt-dark); }
 
 /* wk-lbl 補充（schedule 頁也用相同 id） */
 .wk-lbl {
@@ -1120,7 +1148,6 @@ body { padding-bottom: 64px; }
 }
 
 @media (max-width: 480px) {
-  .bs-gc-rec { display: none; }
   .bs-gc-matchup { font-size: .92rem; }
-  .bs-table { font-size: .78rem; min-width: 460px; }
+  .bs-table { font-size: .78rem; min-width: 540px; }
 }

@@ -151,7 +151,7 @@
   /* ═══════════════════════════════
      首頁：賽程卡片渲染
      ═══════════════════════════════ */
-  function buildHomeGameCard(game) {
+  function buildHomeGameCard(game, phase, weekNum) {
     if (!game.home && !game.away) {
       return `
         <div class="hgc hgc-upcoming">
@@ -163,15 +163,20 @@
     const hc = TEAM_CONFIG[game.home] || {};
     const ac = TEAM_CONFIG[game.away] || {};
     const isUpcoming = game.status === 'upcoming';
+    const isFinished = game.status === 'finished' || game.status === 'live';
 
     let scoreHtml;
-    if (game.status === 'finished' || game.status === 'live') {
+    if (isFinished) {
       const winner = game.homeScore > game.awayScore ? game.home : game.away;
       const badge = `<span class="badge bw" style="font-size:.62rem">${winner}隊勝</span>`;
       scoreHtml = `<div class="hgc-score-row"><span class="hgc-s ${hc.cls}">${game.homeScore}</span><span class="hgc-colon">:</span><span class="hgc-s ${ac.cls}">${game.awayScore}</span></div>${badge}`;
     } else {
       scoreHtml = '<div class="hgc-pending">即將開打</div>';
     }
+
+    const bsLink = (isFinished && phase && weekNum && game.num)
+      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&week=${weekNum}&game=${game.num}" class="bs-link-btn">📊 查看對戰數據</a>`
+      : '';
 
     return `
       <div class="hgc${isUpcoming ? ' hgc-upcoming' : ''}">
@@ -182,6 +187,7 @@
           <span class="hgc-team ${ac.cls}">${game.away}隊</span>
         </div>
         ${scoreHtml}
+        ${bsLink}
       </div>`;
   }
 
@@ -207,7 +213,7 @@
       matchupGrid.innerHTML = weekData.matchups.map(buildHomeMatchupCard).join('');
     }
     if (orderGrid && weekData.games) {
-      orderGrid.innerHTML = weekData.games.map(buildHomeGameCard).join('');
+      orderGrid.innerHTML = weekData.games.map(g => buildHomeGameCard(g, weekData.phase, weekData.week)).join('');
       const hint = document.getElementById('home-order-hint');
       if (hint) hint.style.display = 'block';
     }

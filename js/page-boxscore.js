@@ -19,20 +19,37 @@
     return att === 0 ? '0/0' : `${made}/${att}`;
   }
 
+  function shotPct(miss, made) {
+    const att = miss + made;
+    if (att === 0) return '';
+    return ` <span class="bs-pct">(${Math.round(made / att * 100)}%)</span>`;
+  }
+
+  /* ════════════════════════════════
+     賽制相對週次
+     ════════════════════════════════ */
+  function getPhaseRelativeWeek(wk) {
+    const minWeek = _data.weeks
+      .filter(w => w.phase === wk.phase)
+      .reduce((min, w) => Math.min(min, w.weekNum), wk.weekNum);
+    return wk.weekNum - minWeek + 1;
+  }
+
   /* ════════════════════════════════
      球員列 HTML
      ════════════════════════════════ */
   function playerRowHtml(p, tc) {
     const dnpCls = p.played ? '' : ' bs-dnp';
     const namePart = `<span class="${tc.cls || ''}">${p.name}</span>`;
+    const dnpTag = !p.played ? '<span class="bs-dnp-tag">(未出賽)</span>' : '';
     return `
       <tr class="bs-pr${dnpCls}">
-        <td class="bs-td-name">${namePart}${!p.played ? '<span class="bs-dnp-tag">DNP</span>' : ''}</td>
+        <td class="bs-td-name">${namePart}${dnpTag}</td>
         <td>${p.pts}</td>
         <td>${shotFmt(p.fg2miss, p.fg2made)}</td>
         <td>${shotFmt(p.fg3miss, p.fg3made)}</td>
         <td>${shotFmt(p.ftmiss, p.ftmade)}</td>
-        <td>${p.treb}<span class="bs-sub">${p.oreb}/${p.dreb}</span></td>
+        <td>${p.treb}<span class="bs-paren"> (${p.oreb}/${p.dreb})</span></td>
         <td>${p.ast}</td>
         <td>${p.stl}</td>
         <td>${p.blk}</td>
@@ -46,10 +63,10 @@
       <tr class="bs-tot-row">
         <td class="bs-td-name">合計</td>
         <td>${tot.pts}</td>
-        <td>${shotFmt(tot.fg2miss, tot.fg2made)}</td>
-        <td>${shotFmt(tot.fg3miss, tot.fg3made)}</td>
-        <td>${shotFmt(tot.ftmiss, tot.ftmade)}</td>
-        <td>${tot.treb}<span class="bs-sub">${tot.oreb}/${tot.dreb}</span></td>
+        <td>${shotFmt(tot.fg2miss, tot.fg2made)}${shotPct(tot.fg2miss, tot.fg2made)}</td>
+        <td>${shotFmt(tot.fg3miss, tot.fg3made)}${shotPct(tot.fg3miss, tot.fg3made)}</td>
+        <td>${shotFmt(tot.ftmiss, tot.ftmade)}${shotPct(tot.ftmiss, tot.ftmade)}</td>
+        <td>${tot.treb}<span class="bs-paren"> (${tot.oreb}/${tot.dreb})</span></td>
         <td>${tot.ast}</td>
         <td>${tot.stl}</td>
         <td>${tot.blk}</td>
@@ -63,10 +80,9 @@
      ════════════════════════════════ */
   function teamBoxHtml(teamName, players, totals, score, isHome) {
     const tc = TEAM_CONFIG[teamName] || {};
-    const side = isHome ? '主' : '客';
+    const side = isHome ? '主隊' : '客隊';
     const scoreStr = score !== null ? `<span class="bs-team-score" style="color:${tc.color || 'inherit'}">${score}</span>` : '';
 
-    // 有上場球員才顯示數據列
     const activePlayers = players.filter(p => p.played);
     const dnpPlayers    = players.filter(p => !p.played && p.name);
     const hasPlayerData = players.length > 0;
@@ -85,8 +101,8 @@
     return `
       <div class="bs-team-block">
         <div class="bs-team-header" style="border-left:4px solid ${tc.color || '#ccc'}">
-          <span class="bs-team-badge ${tc.cls || ''}">${teamName}隊</span>
-          <span class="bs-team-side">${side}隊</span>
+          <span class="bs-team-badge ${tc.cls || ''}">${teamName}</span>
+          <span class="bs-team-side">${side}</span>
           ${scoreStr}
         </div>
         <div class="bs-table-wrap">
@@ -94,16 +110,16 @@
             <thead>
               <tr>
                 <th class="bs-th-name">球員</th>
-                <th>得</th>
-                <th>兩分</th>
-                <th>三分</th>
+                <th>得分</th>
+                <th>兩分球</th>
+                <th>三分球</th>
                 <th>罰球</th>
-                <th>板</th>
-                <th>助</th>
-                <th>截</th>
-                <th>阻</th>
-                <th>失</th>
-                <th>犯</th>
+                <th>籃板</th>
+                <th>助攻</th>
+                <th>抄截</th>
+                <th>阻攻</th>
+                <th>失誤</th>
+                <th>犯規</th>
               </tr>
             </thead>
             <tbody>${bodyRows}</tbody>
@@ -120,26 +136,18 @@
     const ac = TEAM_CONFIG[game.awayTeam] || {};
 
     const hasTeams = game.homeTeam && game.awayTeam;
+    const homeWin = game.hasScores && game.homeScore > game.awayScore;
+    const awayWin = game.hasScores && game.awayScore > game.homeScore;
+
     const scoreHtml = game.hasScores
       ? `<span class="bs-gc-s ${hc.cls}">${game.homeScore}</span><span class="bs-gc-colon">:</span><span class="bs-gc-s ${ac.cls}">${game.awayScore}</span>`
       : `<span class="bs-gc-tbd">尚未開打</span>`;
 
-    const winnerBadge = game.hasScores
-      ? (() => {
-          const w = game.homeScore > game.awayScore ? game.homeTeam : game.awayTeam;
-          return `<span class="badge bw" style="font-size:.6rem">${w}隊勝</span>`;
-        })()
-      : '';
-
-    const recorderHtml = game.recorder
-      ? `<span class="bs-gc-rec">記錄：${game.recorder}</span>`
-      : '';
-
     const teamHtml = hasTeams
-      ? `<span class="dot ${hc.dot}"></span><span class="${hc.cls}">${game.homeTeam}</span><span class="bs-gc-vs">VS</span><span class="dot ${ac.dot}"></span><span class="${ac.cls}">${game.awayTeam}</span>`
-      : `<span style="color:var(--txt-light)">尚未公告</span>`;
+      ? `${homeWin ? '<span class="gc-win">👑</span>' : ''}<span class="dot ${hc.dot}"></span><span class="${hc.cls}">${game.homeTeam}</span><span class="bs-gc-vs">VS</span>${awayWin ? '<span class="gc-win">👑</span>' : ''}<span class="dot ${ac.dot}"></span><span class="${ac.cls}">${game.awayTeam}</span>`
+      : ``;
 
-    // 展開後的 boxscore（預設不渲染，展開時才渲染）
+    const gameNum = game.gameNum || (idx + 1);
     const bodyId = `bs-body-${idx}`;
 
     return `
@@ -147,9 +155,7 @@
         <div class="bs-gc-head">
           <div class="bs-gc-stripe" style="background:${hc.color || 'var(--warm2)'}"></div>
           <div class="bs-gc-meta">
-            <span class="bs-gc-num">GAME ${game.gameNum || '—'}</span>
-            ${winnerBadge}
-            ${recorderHtml}
+            <span class="bs-gc-num">GAME ${gameNum}</span>
           </div>
           <div class="bs-gc-matchup">${teamHtml}</div>
           <div class="bs-gc-score">${scoreHtml}</div>
@@ -166,7 +172,12 @@
     if (bodyEl.dataset.rendered) return;
     bodyEl.dataset.rendered = '1';
 
+    const recorderHtml = game.recorder
+      ? `<div class="bs-recorder">📝 記錄：${game.recorder}</div>`
+      : '';
+
     bodyEl.innerHTML = `
+      ${recorderHtml}
       ${teamBoxHtml(game.homeTeam, game.homePlayers, game.homeTot, game.homeScore, true)}
       <div class="bs-divider"></div>
       ${teamBoxHtml(game.awayTeam, game.awayPlayers, game.awayTot, game.awayScore, false)}`;
@@ -197,7 +208,13 @@
       return a.gameNum - b.gameNum;
     });
 
-    container.innerHTML = sorted.map((g, i) => buildGameCard(g, i)).join('');
+    // 熱身賽警告（若已進入例行賽或季後賽）
+    const hasLaterPhase = _data.weeks.some(w => w.phase === '例行賽' || w.phase === '季後賽');
+    const warnHtml = (wk.phase === '熱身賽' && hasLaterPhase)
+      ? `<div class="bs-warn-banner">⚠️ 熱身賽數據不計入統計</div>`
+      : '';
+
+    container.innerHTML = warnHtml + sorted.map((g, i) => buildGameCard(g, i)).join('');
 
     // 事件委派：點擊卡片頭部展開/收合
     container.querySelectorAll('.bs-gc').forEach((card, i) => {
@@ -218,7 +235,8 @@
   function updateHero(wk) {
     const el = document.getElementById('bs-hero-content');
     if (!el || !wk) return;
-    const label = `${wk.phase} · 第 ${wk.weekNum} 週`;
+    const relWeek = getPhaseRelativeWeek(wk);
+    const label = `${wk.phase} · 第 ${relWeek} 週`;
     el.innerHTML = `
       <div class="sched-hero-left">
         <div class="eyebrow" style="color:var(--orange2);margin-bottom:.4rem">第 ${_data.season} 屆</div>
@@ -240,7 +258,8 @@
 
     if (label && _data.weeks[_wkIdx]) {
       const wk = _data.weeks[_wkIdx];
-      label.textContent = `${wk.phase} · 第 ${wk.weekNum} 週`;
+      const relWeek = getPhaseRelativeWeek(wk);
+      label.textContent = `${wk.phase} · 第 ${relWeek} 週`;
     }
   }
 
@@ -265,8 +284,43 @@
         showEmpty(container, '目前尚無對戰數據');
         return;
       }
-      _wkIdx = _data.defaultIdx;
+
+      // 檢查 URL 深層連結
+      const params = new URLSearchParams(location.search);
+      const dlPhase = params.get('phase');
+      const dlWeek  = parseInt(params.get('week'))  || 0;
+      const dlGame  = parseInt(params.get('game'))  || 0;
+
+      if (dlPhase && dlWeek) {
+        const idx = _data.weeks.findIndex(w => w.phase === dlPhase && w.weekNum === dlWeek);
+        _wkIdx = idx >= 0 ? idx : _data.defaultIdx;
+      } else {
+        _wkIdx = _data.defaultIdx;
+      }
+
       renderWeekView();
+
+      // 自動展開指定場次
+      if (dlGame && dlPhase && dlWeek) {
+        requestAnimationFrame(() => {
+          const wk = _data.weeks[_wkIdx];
+          if (!wk) return;
+          const sorted = [...wk.games].sort((a, b) => {
+            if (!a.gameNum && !b.gameNum) return 0;
+            if (!a.gameNum) return 1;
+            if (!b.gameNum) return -1;
+            return a.gameNum - b.gameNum;
+          });
+          const gameIdx = sorted.findIndex(g => g.gameNum === dlGame);
+          if (gameIdx < 0) return;
+          const cards = document.querySelectorAll('#bs-games .bs-gc');
+          if (!cards[gameIdx]) return;
+          const card = cards[gameIdx];
+          card.classList.add('open');
+          renderGameBody(sorted[gameIdx], card.querySelector('.bs-gc-body'));
+          setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+        });
+      }
     } catch (err) {
       console.error('載入對戰數據失敗:', err);
       showError(container, '數據載入失敗，請稍後重試', 'loadBoxscore');

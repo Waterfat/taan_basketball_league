@@ -37,7 +37,7 @@
   /* ═══════════════════════════════
      Schedule page — game cards
      ═══════════════════════════════ */
-  function buildSchedGameCard(game) {
+  function buildSchedGameCard(game, phase, weekNum) {
     // 賽程順序尚未排定 → 簡化顯示
     if (!game.home && !game.away) {
       return `
@@ -79,6 +79,10 @@
       }).join('');
     }
 
+    const bsLink = (isFinished && phase && weekNum && game.num)
+      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&week=${weekNum}&game=${game.num}" class="bs-link-btn">📊 查看對戰數據</a>`
+      : '';
+
     // 有比分(finished) → 全部收合；沒比分(upcoming) → 全部展開
     return `
       <div class="game-card${!isFinished ? ' open' : ''}">
@@ -93,7 +97,7 @@
           ${scoreSection}
           <div class="gc-arr">▼</div>
         </div>
-        <div class="gc-body">${staffHtml}</div>
+        <div class="gc-body">${staffHtml}${bsLink}</div>
       </div>`;
   }
 
@@ -145,7 +149,7 @@
       showEmpty(container, '本週尚無賽程資料');
       return;
     }
-    container.innerHTML = weekData.games.map(g => buildSchedGameCard(g)).join('');
+    container.innerHTML = weekData.games.map(g => buildSchedGameCard(g, weekData.phase, weekData.week)).join('');
   }
 
   function renderScheduleMatchups(weekData) {
