@@ -964,3 +964,163 @@ body { padding-bottom: 64px; }
 }
 .skeleton-line { height: .85rem; margin-bottom: .5rem; border-radius: 4px; }
 .skeleton-line:last-child { width: 60%; }
+
+/* ═══════════════════════════════════
+   BOXSCORE PAGE STYLES
+═══════════════════════════════════ */
+
+/* Hero */
+.bs-hero {
+  position: relative; overflow: hidden; border-radius: var(--r);
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy3) 100%);
+  padding: 1.4rem 1.5rem 1.2rem;
+}
+.bs-hero .sched-hero-left { color: #fff; }
+.bs-hero .sched-hero-left h2 { color: #fff; }
+
+/* 比賽卡片 */
+.bs-gc {
+  background: #fff;
+  border-radius: var(--r);
+  box-shadow: 0 2px 10px rgba(15,27,45,.07), 0 0 0 1px rgba(15,27,45,.05);
+  margin-bottom: .55rem;
+  overflow: hidden;
+}
+
+.bs-gc-head {
+  display: flex; align-items: center; gap: .7rem;
+  padding: .72rem .9rem .72rem 0;
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s;
+  position: relative;
+}
+.bs-gc-head:hover { background: var(--warm1); }
+
+.bs-gc-stripe {
+  width: 4px; height: 100%; min-height: 42px;
+  flex-shrink: 0; align-self: stretch;
+}
+
+.bs-gc-meta {
+  display: flex; align-items: center; gap: .35rem; flex-shrink: 0; min-width: 60px;
+}
+.bs-gc-num {
+  font-family: var(--font-disp); font-size: .85rem; letter-spacing: .06em;
+  color: var(--txt-light);
+}
+.bs-gc-rec {
+  font-family: var(--font-cond); font-size: .62rem; color: var(--txt-light);
+  letter-spacing: .04em; white-space: nowrap;
+}
+
+.bs-gc-matchup {
+  flex: 1; display: flex; align-items: center; gap: .4rem;
+  font-family: var(--font-disp); font-size: 1.05rem; letter-spacing: .04em;
+  min-width: 0;
+}
+.bs-gc-vs { font-size: .55rem; color: var(--txt-light); flex-shrink: 0; }
+
+.bs-gc-score {
+  display: flex; align-items: center; gap: .22rem;
+  font-family: var(--font-disp); font-size: 1.2rem; letter-spacing: .04em;
+  flex-shrink: 0;
+}
+.bs-gc-s { font-weight: 700; }
+.bs-gc-colon { font-size: .7rem; color: var(--txt-light); }
+.bs-gc-tbd { font-family: var(--font-cond); font-size: .72rem; color: var(--txt-light); font-weight: 700; }
+
+.bs-gc-arr {
+  font-size: .65rem; color: var(--txt-light); flex-shrink: 0;
+  transition: transform .22s;
+  margin-left: .2rem;
+}
+.bs-gc.open .bs-gc-arr { transform: rotate(180deg); }
+
+/* 展開體 */
+.bs-gc-body { display: none; }
+.bs-gc.open .bs-gc-body {
+  display: block;
+  border-top: 1px solid var(--warm1);
+}
+
+/* 隊伍區塊 */
+.bs-team-block { padding: .8rem .9rem; }
+.bs-team-header {
+  display: flex; align-items: center; gap: .55rem;
+  padding: .45rem .6rem; margin-bottom: .55rem;
+  background: var(--warm1); border-radius: var(--r-sm);
+}
+.bs-team-badge {
+  font-family: var(--font-disp); font-size: 1.1rem; font-weight: 700; letter-spacing: .04em;
+}
+.bs-team-side {
+  font-family: var(--font-cond); font-size: .65rem; font-weight: 800;
+  letter-spacing: .1em; color: var(--txt-light); text-transform: uppercase;
+}
+.bs-team-score {
+  font-family: var(--font-hero); font-size: 2rem; line-height: 1;
+  margin-left: auto; letter-spacing: .02em;
+}
+
+.bs-divider {
+  height: 6px; background: var(--warm1);
+}
+
+/* 數據表 */
+.bs-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.bs-table {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--font-cond); font-size: .82rem;
+  min-width: 520px;
+}
+.bs-table th {
+  font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+  color: var(--txt-light); text-transform: uppercase;
+  padding: .4rem .5rem; border-bottom: 2px solid var(--warm1); text-align: center;
+  white-space: nowrap;
+}
+.bs-th-name { text-align: left !important; min-width: 80px; padding-left: .3rem !important; }
+
+.bs-table td {
+  padding: .52rem .5rem; border-bottom: 1px solid var(--warm1);
+  text-align: center; white-space: nowrap;
+}
+.bs-td-name {
+  text-align: left !important; padding-left: .3rem !important;
+  min-width: 80px; font-size: .85rem;
+}
+
+.bs-pr:hover td { background: var(--warm1); }
+.bs-pr.bs-dnp { opacity: .45; }
+.bs-dnp-tag {
+  display: inline-block; margin-left: .35rem;
+  font-family: var(--font-cond); font-size: .55rem; font-weight: 800;
+  letter-spacing: .06em; color: var(--txt-light);
+  background: var(--warm2); border-radius: 3px; padding: .05rem .3rem;
+  vertical-align: middle;
+}
+.bs-tot-row td {
+  font-weight: 700; border-bottom: none;
+  border-top: 2px solid var(--warm2);
+  color: var(--txt-dark); background: var(--warm1);
+}
+.bs-tot-row .bs-td-name { font-family: var(--font-cond); font-size: .78rem; color: var(--txt-mid); }
+
+.bs-sub {
+  display: block; font-size: .58rem; color: var(--txt-light);
+  margin-top: .05rem; letter-spacing: 0;
+}
+
+/* wk-lbl 補充（schedule 頁也用相同 id） */
+.wk-lbl {
+  font-family: var(--font-cond); font-size: .85rem; font-weight: 800;
+  letter-spacing: .06em; color: var(--txt-mid); text-align: center; flex: 1;
+}
+
+@media (max-width: 480px) {
+  .bs-gc-rec { display: none; }
+  .bs-gc-matchup { font-size: .92rem; }
+  .bs-table { font-size: .78rem; min-width: 460px; }
+}

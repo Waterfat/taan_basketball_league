@@ -565,6 +565,114 @@ const MOCK_DATA = {
     "17": { "$ref_copy": "19" }
   },
 
+  /* ── 對戰數據 boxscore ── */
+  boxscore: {
+    season: 25,
+    defaultIdx: 0,
+    weeks: [
+      {
+        phase: "例行賽", weekNum: 1,
+        games: [
+          {
+            weekNum: 1, gameNum: 1, phase: "例行賽",
+            homeTeam: "綠", awayTeam: "紅",
+            homeScore: 29, awayScore: 23,
+            recorder: "火", hasScores: true, countsForStats: true,
+            homeTot:  { fg2miss:11,fg2made:12,fg3miss:9,fg3made:1,ftmiss:3,ftmade:2,pts:29,oreb:8,dreb:13,treb:21,ast:8,blk:0,stl:4,tov:7,pf:4 },
+            awayTot:  { fg2miss:13,fg2made:9,fg3miss:3,fg3made:0,ftmiss:3,ftmade:5,pts:23,oreb:4,dreb:9,treb:13,ast:10,blk:1,stl:4,tov:7,pf:3 },
+            homePlayers: [
+              { name:"吳家豪",team:"綠",played:true, fg2miss:1,fg2made:3,fg3miss:4,fg3made:0,ftmiss:0,ftmade:0,pts:6, oreb:0,dreb:4,treb:4,ast:2,blk:0,stl:1,tov:3,pf:0 },
+              { name:"黃偉訓",team:"綠",played:true, fg2miss:2,fg2made:8,fg3miss:0,fg3made:0,ftmiss:1,ftmade:1,pts:17,oreb:6,dreb:0,treb:6,ast:0,blk:0,stl:2,tov:1,pf:0 },
+              { name:"曾昱嘉",team:"綠",played:false,fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0 },
+              { name:"楊秉諺",team:"綠",played:true, fg2miss:1,fg2made:0,fg3miss:0,fg3made:0,ftmiss:2,ftmade:0,pts:0, oreb:0,dreb:5,treb:5,ast:1,blk:0,stl:0,tov:1,pf:3 },
+              { name:"林光偉",team:"綠",played:true, fg2miss:1,fg2made:1,fg3miss:1,fg3made:0,ftmiss:0,ftmade:0,pts:2, oreb:2,dreb:3,treb:5,ast:1,blk:0,stl:0,tov:2,pf:1 },
+              { name:"趙伯熙",team:"綠",played:true, fg2miss:1,fg2made:0,fg3miss:2,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:0,dreb:0,treb:0,ast:3,blk:0,stl:1,tov:0,pf:0 },
+              { name:"連育樟",team:"綠",played:true, fg2miss:2,fg2made:0,fg3miss:1,fg3made:0,ftmiss:0,ftmade:1,pts:1, oreb:0,dreb:1,treb:1,ast:1,blk:0,stl:0,tov:0,pf:0 },
+              { name:"張仁豪",team:"綠",played:true, fg2miss:2,fg2made:0,fg3miss:1,fg3made:1,ftmiss:0,ftmade:0,pts:3, oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0 }
+            ],
+            awayPlayers: [
+              { name:"韋承志",team:"紅",played:true, fg2miss:3,fg2made:2,fg3miss:0,fg3made:0,ftmiss:0,ftmade:2,pts:6, oreb:2,dreb:4,treb:6,ast:1,blk:1,stl:0,tov:5,pf:1 },
+              { name:"吳軒宇",team:"紅",played:false,fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0 },
+              { name:"周昱丞",team:"紅",played:true, fg2miss:3,fg2made:0,fg3miss:1,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:1,dreb:3,treb:4,ast:2,blk:0,stl:0,tov:1,pf:0 },
+              { name:"趙尹旋",team:"紅",played:true, fg2miss:3,fg2made:4,fg3miss:0,fg3made:0,ftmiss:0,ftmade:2,pts:10,oreb:0,dreb:0,treb:0,ast:4,blk:0,stl:2,tov:1,pf:0 },
+              { name:"陳彥廷",team:"黃",played:true, fg2miss:4,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:0,dreb:1,treb:1,ast:3,blk:0,stl:1,tov:1,pf:1 },
+              { name:"陳國弘",team:"黑",played:true, fg2miss:0,fg2made:3,fg3miss:2,fg3made:0,ftmiss:3,ftmade:1,pts:7, oreb:1,dreb:1,treb:2,ast:0,blk:0,stl:1,tov:1,pf:1 }
+            ]
+          },
+          {
+            weekNum: 1, gameNum: 2, phase: "例行賽",
+            homeTeam: "藍", awayTeam: "黑",
+            homeScore: 10, awayScore: 15,
+            recorder: "八嘎", hasScores: true, countsForStats: true,
+            homeTot:  { fg2miss:12,fg2made:3,fg3miss:8,fg3made:1,ftmiss:2,ftmade:1,pts:10,oreb:6,dreb:11,treb:14,ast:2,blk:0,stl:4,tov:6,pf:9 },
+            awayTot:  { fg2miss:12,fg2made:3,fg3miss:3,fg3made:0,ftmiss:2,ftmade:9,pts:15,oreb:6,dreb:16,treb:22,ast:4,blk:1,stl:4,tov:8,pf:4 },
+            homePlayers: [
+              { name:"李勁緯",team:"藍",played:true, fg2miss:3,fg2made:1,fg3miss:0,fg3made:1,ftmiss:2,ftmade:1,pts:6, oreb:1,dreb:1,treb:2,ast:0,blk:0,stl:1,tov:1,pf:1 },
+              { name:"陳頤",  team:"藍",played:true, fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:3,dreb:0,treb:3,ast:1,blk:0,stl:1,tov:0,pf:1 },
+              { name:"吳佳憲",team:"藍",played:true, fg2miss:4,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:0,dreb:1,treb:1,ast:0,blk:0,stl:0,tov:2,pf:0 },
+              { name:"胡展綸",team:"藍",played:true, fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:1,dreb:4,treb:5,ast:1,blk:0,stl:1,tov:1,pf:1 },
+              { name:"粘智翔",team:"藍",played:true, fg2miss:0,fg2made:0,fg3miss:4,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:0,dreb:1,treb:1,ast:0,blk:0,stl:0,tov:0,pf:3 },
+              { name:"李崢嶸",team:"藍",played:true, fg2miss:5,fg2made:2,fg3miss:1,fg3made:0,ftmiss:0,ftmade:0,pts:4, oreb:1,dreb:2,treb:3,ast:0,blk:0,stl:1,tov:1,pf:1 },
+              { name:"董鎧維",team:"藍",played:true, fg2miss:0,fg2made:0,fg3miss:3,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:0,dreb:2,treb:2,ast:0,blk:0,stl:0,tov:1,pf:2 }
+            ],
+            awayPlayers: [
+              { name:"李昊明",team:"黑",played:true, fg2miss:4,fg2made:1,fg3miss:0,fg3made:0,ftmiss:1,ftmade:1,pts:3, oreb:1,dreb:3,treb:4,ast:1,blk:0,stl:2,tov:1,pf:0 },
+              { name:"林毅豐",team:"黑",played:true, fg2miss:2,fg2made:0,fg3miss:0,fg3made:0,ftmiss:1,ftmade:1,pts:1, oreb:2,dreb:6,treb:8,ast:0,blk:1,stl:0,tov:2,pf:1 },
+              { name:"林志柏",team:"黑",played:false,fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0 },
+              { name:"李子昂",team:"黑",played:true, fg2miss:2,fg2made:1,fg3miss:0,fg3made:0,ftmiss:0,ftmade:4,pts:6, oreb:2,dreb:5,treb:7,ast:0,blk:0,stl:1,tov:3,pf:0 },
+              { name:"陳國弘",team:"黑",played:true, fg2miss:1,fg2made:1,fg3miss:3,fg3made:0,ftmiss:0,ftmade:1,pts:3, oreb:0,dreb:2,treb:2,ast:1,blk:0,stl:1,tov:1,pf:1 },
+              { name:"梁修綸",team:"黑",played:false,fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0 },
+              { name:"連育樟",team:"綠",played:true, fg2miss:3,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:2,pts:2, oreb:1,dreb:0,treb:1,ast:2,blk:0,stl:1,tov:1,pf:2 }
+            ]
+          },
+          {
+            weekNum: 1, gameNum: 3, phase: "例行賽",
+            homeTeam: "黃", awayTeam: "白",
+            homeScore: 32, awayScore: 18,
+            recorder: "昂", hasScores: true, countsForStats: true,
+            homeTot:  { fg2miss:8,fg2made:10,fg3miss:5,fg3made:2,ftmiss:1,ftmade:4,pts:32,oreb:5,dreb:8,treb:13,ast:7,blk:1,stl:6,tov:5,pf:5 },
+            awayTot:  { fg2miss:14,fg2made:5,fg3miss:4,fg3made:0,ftmiss:2,ftmade:8,pts:18,oreb:6,dreb:11,treb:17,ast:3,blk:0,stl:3,tov:9,pf:6 },
+            homePlayers: [
+              { name:"李世昌",team:"黃",played:true, fg2miss:1,fg2made:3,fg3miss:1,fg3made:1,ftmiss:0,ftmade:2,pts:11,oreb:0,dreb:2,treb:2,ast:1,blk:1,stl:2,tov:2,pf:1 },
+              { name:"陳鼎煬",team:"黃",played:true, fg2miss:2,fg2made:1,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:2, oreb:1,dreb:2,treb:3,ast:2,blk:0,stl:1,tov:1,pf:2 },
+              { name:"陳鈞銘",team:"黃",played:true, fg2miss:1,fg2made:2,fg3miss:2,fg3made:1,ftmiss:0,ftmade:0,pts:7, oreb:0,dreb:1,treb:1,ast:2,blk:0,stl:2,tov:0,pf:0 },
+              { name:"李宗漢",team:"黃",played:true, fg2miss:1,fg2made:2,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:4, oreb:1,dreb:1,treb:2,ast:1,blk:0,stl:0,tov:1,pf:1 },
+              { name:"吳冠德",team:"黃",played:true, fg2miss:2,fg2made:1,fg3miss:1,fg3made:0,ftmiss:0,ftmade:0,pts:2, oreb:2,dreb:1,treb:3,ast:1,blk:0,stl:1,tov:0,pf:0 },
+              { name:"盧以朋",team:"黃",played:true, fg2miss:1,fg2made:1,fg3miss:0,fg3made:0,ftmiss:0,ftmade:2,pts:4, oreb:1,dreb:1,treb:2,ast:0,blk:0,stl:0,tov:1,pf:1 },
+              { name:"陳彥廷",team:"黃",played:true, fg2miss:0,fg2made:0,fg3miss:1,fg3made:0,ftmiss:1,ftmade:0,pts:0, oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0 }
+            ],
+            awayPlayers: [
+              { name:"陳曉川",team:"白",played:true, fg2miss:2,fg2made:1,fg3miss:0,fg3made:0,ftmiss:0,ftmade:2,pts:4, oreb:2,dreb:4,treb:6,ast:0,blk:0,stl:0,tov:2,pf:1 },
+              { name:"陳彥汗",team:"白",played:false,fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0 },
+              { name:"徐子超",team:"白",played:true, fg2miss:3,fg2made:1,fg3miss:0,fg3made:0,ftmiss:0,ftmade:1,pts:3, oreb:0,dreb:2,treb:2,ast:1,blk:0,stl:1,tov:2,pf:2 },
+              { name:"林昇德",team:"白",played:true, fg2miss:2,fg2made:1,fg3miss:1,fg3made:0,ftmiss:0,ftmade:2,pts:4, oreb:1,dreb:1,treb:2,ast:0,blk:0,stl:1,tov:2,pf:1 },
+              { name:"彥榕",  team:"白",played:false,fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0, oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0 },
+              { name:"林浚鑫",team:"白",played:true, fg2miss:2,fg2made:0,fg3miss:1,fg3made:0,ftmiss:1,ftmade:1,pts:1, oreb:0,dreb:1,treb:1,ast:1,blk:0,stl:0,tov:1,pf:0 },
+              { name:"陳泓瑋",team:"白",played:true, fg2miss:1,fg2made:1,fg3miss:1,fg3made:0,ftmiss:0,ftmade:0,pts:2, oreb:1,dreb:2,treb:3,ast:0,blk:0,stl:1,tov:1,pf:1 },
+              { name:"竺立梵",team:"白",played:true, fg2miss:2,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:2,pts:2, oreb:1,dreb:0,treb:1,ast:1,blk:0,stl:0,tov:0,pf:1 },
+              { name:"王昶竣",team:"白",played:true, fg2miss:2,fg2made:1,fg3miss:1,fg3made:0,ftmiss:1,ftmade:0,pts:2, oreb:1,dreb:1,treb:2,ast:0,blk:0,stl:0,tov:1,pf:0 }
+            ]
+          },
+          { weekNum:1, gameNum:4, phase:"例行賽", homeTeam:"黑", awayTeam:"綠",
+            homeScore:null, awayScore:null, recorder:"", hasScores:false, countsForStats:true,
+            homeTot:{fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0,oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0},
+            awayTot:{fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0,oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0},
+            homePlayers:[], awayPlayers:[] },
+          { weekNum:1, gameNum:5, phase:"例行賽", homeTeam:"藍", awayTeam:"黃",
+            homeScore:null, awayScore:null, recorder:"", hasScores:false, countsForStats:true,
+            homeTot:{fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0,oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0},
+            awayTot:{fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0,oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0},
+            homePlayers:[], awayPlayers:[] },
+          { weekNum:1, gameNum:6, phase:"例行賽", homeTeam:"白", awayTeam:"紅",
+            homeScore:null, awayScore:null, recorder:"", hasScores:false, countsForStats:true,
+            homeTot:{fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0,oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0},
+            awayTot:{fg2miss:0,fg2made:0,fg3miss:0,fg3made:0,ftmiss:0,ftmade:0,pts:0,oreb:0,dreb:0,treb:0,ast:0,blk:0,stl:0,tov:0,pf:0},
+            homePlayers:[], awayPlayers:[] }
+        ]
+      }
+    ]
+  },
+
   /* ── 名人堂 hof ── */
   hof: {
     description: "聯盟歷史 · 第11–19屆、第24屆",

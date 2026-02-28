@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>對戰數據 — 大安ㄍㄤㄍㄤ好籃球聯盟</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Anton&family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared-styles.css?v=20260228">
+</head>
+<body>
+
+<nav id="top-nav"></nav>
+<nav class="bottom-nav" id="bottom-nav"></nav>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <div class="bs-hero" id="bs-hero">
+    <div id="bs-hero-content"></div>
+  </div>
+
+  <!-- 週次導航 -->
+  <div class="week-nav">
+    <button id="btn-prev-week" class="wbtn">← 前一週</button>
+    <div id="wk-label" class="wk-lbl"></div>
+    <button id="btn-next-week" class="wbtn">下一週 →</button>
+  </div>
+
+  <!-- 六場比賽卡片 -->
+  <div id="bs-games"></div>
+
+</div>
+
+<script src="shared-app.js?v=20260228"></script>
+<script src="js/mock-data.js?v=20260228"></script>
+<script src="js/api.js?v=20260228"></script>
+<script src="js/page-boxscore.js?v=20260228"></script>
+<script>document.addEventListener('DOMContentLoaded', loadBoxscore);</script>
+</body>
+</html>

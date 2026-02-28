@@ -24,6 +24,7 @@ const NAV_ITEMS = [
   { id: 'home',     label: '首頁',       icon: '🏠', file: 'index.html' },
   { id: 'schedule', label: '賽程',       icon: '📅', file: 'schedule.html' },
   { id: 'standings',label: '戰績榜',     icon: '🏆', file: 'standings.html' },
+  { id: 'boxscore', label: '數據',       icon: '📊', file: 'boxscore.html' },
   { id: 'roster',   label: '球員名單',   icon: '👥', file: 'roster.html' },
   { id: 'dragon',   label: '龍虎榜',     icon: '🐉', file: 'dragon.html' },
   // 以下功能暫不開放，待後續版本製作

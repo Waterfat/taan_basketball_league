@@ -22,6 +22,7 @@ const ApiConfig = {
     allSchedule:  'datas!D87:N113',
     allRotation:  'datas!Q88:AC177',
     allMatchups:  'datas!D117:F206',
+    boxscore:     'boxscore!A1:AO1980',
   },
 
   /**
@@ -43,6 +44,7 @@ const ApiConfig = {
     rotation:  { file: 'rotation.json',  sheets: false },
     hof:       { file: 'hof.json',       sheets: false },
     home:      { file: 'home.json',      sheets: true  },
+    boxscore:  { file: 'boxscore.json',  sheets: true  },
   },
 
   /** 當前賽季屆數 */
@@ -690,6 +692,147 @@ function transformHome(homeRows, standingsRows, dragonRows, allWeeks) {
   };
 }
 
+/* ── 轉換：對戰數據（boxscore） ── */
+
+/**
+ * 22 列為一場比賽的資料結構：
+ *  [0] meta1  : A=第幾週標籤, B=週次, F=場次, J=賽制, S=主隊, V=客隊
+ *  [1] meta2  : O=記錄人, S=主隊得分, V=客隊得分
+ *  [2] 欄位標題列 (skip)
+ *  [3] 子標題列 (skip)
+ *  [4..20] 球員數據列，共 17 筆（主客並排）
+ *  [21] 合計列
+ */
+function transformBoxscore(rows) {
+  const BLOCK = 22;
+  const games = [];
+
+  const num = (v) => {
+    if (!v || v === '#N/A') return 0;
+    const n = parseInt(v);
+    return isNaN(n) ? 0 : n;
+  };
+  const str = (v) => (!v || v === '#N/A') ? '' : String(v).trim();
+
+  for (let i = 0; i + BLOCK <= rows.length; i += BLOCK) {
+    const b = rows.slice(i, i + BLOCK);
+    const m1 = b[0] || [];
+    const m2 = b[1] || [];
+
+    const weekNum = num(m1[1]);   // col B
+    const gameNum = num(m1[5]);   // col F
+    const phase   = str(m1[9]);   // col J
+    const homeTeam = str(m1[18]); // col S
+    const awayTeam = str(m1[21]); // col V
+
+    // 週次或場次右側數字有缺少 → 不計入統計
+    const countsForStats = weekNum > 0 && gameNum > 0;
+    if (!weekNum) continue;
+
+    const recorder  = str(m2[14]);          // col O
+    const homeScore = parseInt(m2[18]) || null; // col S
+    const awayScore = parseInt(m2[21]) || null; // col V
+    const hasScores = homeScore !== null && awayScore !== null;
+
+    // 合計列 (block index 21)
+    const totRow = b[21] || [];
+    const homeTot = {
+      fg2miss: num(totRow[1]),  fg2made: num(totRow[2]),
+      fg3miss: num(totRow[4]),  fg3made: num(totRow[5]),
+      ftmiss:  num(totRow[7]),  ftmade:  num(totRow[8]),
+      pts: num(totRow[10]), oreb: num(totRow[11]), dreb: num(totRow[12]),
+      ast: num(totRow[14]), blk: num(totRow[15]), stl: num(totRow[16]),
+      tov: num(totRow[17]), pf: num(totRow[18]),
+    };
+    homeTot.treb = homeTot.oreb + homeTot.dreb;
+
+    const awTot = totRow;
+    const awayTot = {
+      fg2miss: num(awTot[22]), fg2made: num(awTot[23]),
+      fg3miss: num(awTot[25]), fg3made: num(awTot[26]),
+      ftmiss:  num(awTot[28]), ftmade:  num(awTot[29]),
+      pts: num(awTot[31]), oreb: num(awTot[32]), dreb: num(awTot[33]),
+      ast: num(awTot[35]), blk: num(awTot[36]), stl: num(awTot[37]),
+      tov: num(awTot[38]), pf:  num(awTot[39]),
+    };
+    awayTot.treb = awayTot.oreb + awayTot.dreb;
+
+    // 球員列 (block indices 4..20)
+    const homePlayers = [];
+    const awayPlayers = [];
+
+    for (let r = 4; r <= 20; r++) {
+      const row = b[r] || [];
+
+      // 主隊球員
+      const homeRaw = str(row[0]);  // col A
+      if (homeRaw) {
+        const { name, team } = parseSheetsName(homeRaw + ')'); // 補上遺漏的右括號
+        const played = !!str(row[19]);  // col T：出賽名單確認
+        homePlayers.push({
+          name, team, played: countsForStats && played,
+          fg2miss: num(row[1]),  fg2made: num(row[2]),
+          fg3miss: num(row[4]),  fg3made: num(row[5]),
+          ftmiss:  num(row[7]),  ftmade:  num(row[8]),
+          pts: num(row[10]), oreb: num(row[11]), dreb: num(row[12]),
+          ast: num(row[14]), blk: num(row[15]), stl: num(row[16]),
+          tov: num(row[17]), pf: num(row[18]),
+        });
+        const p = homePlayers[homePlayers.length - 1];
+        p.treb = p.oreb + p.dreb;
+      }
+
+      // 客隊球員
+      const awayRaw = str(row[21]); // col V
+      if (awayRaw) {
+        const { name, team } = parseSheetsName(awayRaw + ')');
+        const played = !!str(row[40]); // col AO：出賽名單確認
+        awayPlayers.push({
+          name, team, played: countsForStats && played,
+          fg2miss: num(row[22]), fg2made: num(row[23]),
+          fg3miss: num(row[25]), fg3made: num(row[26]),
+          ftmiss:  num(row[28]), ftmade:  num(row[29]),
+          pts: num(row[31]), oreb: num(row[32]), dreb: num(row[33]),
+          ast: num(row[35]), blk: num(row[36]), stl: num(row[37]),
+          tov: num(row[38]), pf:  num(row[39]),
+        });
+        const p = awayPlayers[awayPlayers.length - 1];
+        p.treb = p.oreb + p.dreb;
+      }
+    }
+
+    games.push({
+      weekNum, gameNum, phase, homeTeam, awayTeam,
+      homeScore, awayScore, recorder, hasScores, countsForStats,
+      homePlayers, awayPlayers, homeTot, awayTot,
+    });
+  }
+
+  // 依 (phase, weekNum) 分組
+  const PHASE_ORDER = { '熱身賽': 0, '例行賽': 1, '季後賽': 2 };
+  const groupMap = {};
+  games.forEach(g => {
+    const key = `${g.phase}_${g.weekNum}`;
+    if (!groupMap[key]) {
+      groupMap[key] = { phase: g.phase, weekNum: g.weekNum, games: [] };
+    }
+    groupMap[key].games.push(g);
+  });
+
+  const weeks = Object.values(groupMap).sort((a, b) => {
+    const po = (PHASE_ORDER[a.phase] ?? 9) - (PHASE_ORDER[b.phase] ?? 9);
+    return po !== 0 ? po : a.weekNum - b.weekNum;
+  });
+
+  // 預設顯示最新有比分資料的週次
+  let defaultIdx = weeks.length - 1;
+  for (let i = weeks.length - 1; i >= 0; i--) {
+    if (weeks[i].games.some(g => g.hasScores)) { defaultIdx = i; break; }
+  }
+
+  return { weeks, defaultIdx, season: ApiConfig.currentSeason };
+}
+
 /* ═══════════════════════════════════════
    公開 API
    ═══════════════════════════════════════ */
@@ -807,6 +950,22 @@ const api = {
     } catch (err) {
       console.warn('[api] Sheets 取得首頁資料失敗，回退靜態 JSON:', err.message);
       return fetchStatic('home');
+    }
+  },
+
+  /** 對戰數據（boxscore） */
+  async getBoxscore() {
+    if (!USE_SHEETS) return fetchStatic('boxscore');
+    const cached = getCached('ep:boxscore');
+    if (cached) return cached;
+    try {
+      const rows = await fetchSheetsRange(ApiConfig.sheetsRanges.boxscore);
+      const data = transformBoxscore(rows);
+      setCache('ep:boxscore', data);
+      return data;
+    } catch (err) {
+      console.warn('[api] Sheets 取得 boxscore 失敗，回退靜態 JSON:', err.message);
+      return fetchStatic('boxscore');
     }
   },
 
