@@ -500,7 +500,6 @@ body { padding-bottom: 64px; }
 .game-card.open .gc-stripe { background: linear-gradient(180deg, var(--orange), var(--orange2)); }
 .gc-num { font-family: var(--font-disp); font-size: .72rem; letter-spacing: .1em; color: var(--txt-light); min-width: 52px; padding-left: .5rem; flex-shrink: 0; }
 .gc-teams { flex: 1; display: flex; align-items: center; gap: .3rem; font-family: var(--font-disp); font-size: 1.1rem; letter-spacing: .04em; color: var(--txt-dark); min-width: 0; }
-.gc-crown { width: 1.15em; text-align: center; flex-shrink: 0; font-size: .85rem; }
 .gc-tname-h { flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .gc-tname-a { flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .gc-score-mid { flex-shrink: 0; text-align: center; min-width: 70px; font-family: var(--font-disp); font-size: 1.2rem; letter-spacing: .04em; }
