@@ -144,8 +144,10 @@
     }).filter(Boolean).join('');
 
     return `
-      <div class="label" style="margin-top:1.2rem">🏅 本季個人領先榜</div>
-      <div class="ldr-cards-grid">${cards}</div>`;
+      <div class="ldr-section">
+        <div class="label">🏅 本季個人領先榜</div>
+        <div class="ldr-cards-grid">${cards}</div>
+      </div>`;
   }
 
   /* ════════════════════════════════
@@ -192,13 +194,15 @@
     }).join('');
 
     return `
-      <div class="label" style="margin-top:1.2rem">${emoji} ${title}</div>
-      <div class="card" style="overflow:hidden;padding:0">
-        <div class="ldr-table-wrap">
-          <table class="ldr-table">
-            <thead><tr>${theadHtml}</tr></thead>
-            <tbody>${tbodyHtml}</tbody>
-          </table>
+      <div class="ldr-section">
+        <div class="label">${emoji} ${title}</div>
+        <div class="card" style="overflow:hidden;padding:0">
+          <div class="ldr-table-wrap">
+            <table class="ldr-table">
+              <thead><tr>${theadHtml}</tr></thead>
+              <tbody>${tbodyHtml}</tbody>
+            </table>
+          </div>
         </div>
       </div>`;
   }
