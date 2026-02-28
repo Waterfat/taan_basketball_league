@@ -168,7 +168,8 @@
     let scoreHtml;
     if (isFinished) {
       const winner = game.homeScore > game.awayScore ? game.home : game.away;
-      const badge = `<span class="badge bw" style="font-size:.62rem">${winner}隊勝</span>`;
+      const winnerTc = TEAM_CONFIG[winner] || {};
+      const badge = `<span class="badge bw ${winnerTc.cls || ''}" style="font-size:.62rem">${winner}隊勝</span>`;
       scoreHtml = `<div class="hgc-score-row"><span class="hgc-s ${hc.cls}">${game.homeScore}</span><span class="hgc-colon">:</span><span class="hgc-s ${ac.cls}">${game.awayScore}</span></div>${badge}`;
     } else {
       scoreHtml = '<div class="hgc-pending">即將開打</div>';
