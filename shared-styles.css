@@ -127,11 +127,6 @@ body { padding-bottom: 64px; }
   font-family: var(--font-cond); font-size: .7rem; font-weight: 800;
   letter-spacing: .18em; color: var(--orange); text-transform: uppercase; margin-bottom: .35rem;
 }
-.sec-title {
-  font-family: var(--font-disp); font-size: 1.8rem; letter-spacing: .04em;
-  color: var(--txt-dark); line-height: 1; margin-bottom: .2rem;
-}
-.sec-sub { font-size: .8rem; color: var(--txt-light); margin-bottom: 1.75rem; }
 .label {
   font-family: var(--font-cond); font-size: .68rem; font-weight: 800;
   letter-spacing: .14em; color: var(--txt-light); text-transform: uppercase; margin-bottom: .65rem;
@@ -143,12 +138,6 @@ body { padding-bottom: 64px; }
   border-radius: var(--r);
   box-shadow: 0 2px 12px rgba(15,27,45,.08), 0 0 0 1px rgba(15,27,45,.05);
 }
-.card-navy {
-  background: var(--navy2);
-  border-radius: var(--r);
-  box-shadow: 0 4px 20px rgba(0,0,0,.25);
-}
-
 /* ──────────────── BADGE ──────────────── */
 .badge {
   display: inline-flex; align-items: center; gap: .2rem;
@@ -252,17 +241,13 @@ body { padding-bottom: 64px; }
 .st-hist-label { display:none; font-family:var(--font-cond); font-size:.6rem; font-weight:800; color:var(--txt-light); letter-spacing:.06em; margin-right:4px; }
 @media (max-width: 600px) { .st-hist-label { display:inline; } }
 
-/* progress track */
-.prog-track { background:var(--warm2); border-radius:99px; height:6px; overflow:hidden; margin-top:.5rem; }
-.prog-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--orange),var(--orange2)); }
-
 /* ──────── UTILS ──────── */
 .row { display:flex; align-items:center; }
 .between { justify-content:space-between; }
-.gap-sm { gap:.5rem; } .gap { gap:1rem; }
+.gap { gap:1rem; }
 .mt { margin-top:1.5rem; } .mt-sm { margin-top:.85rem; }
 .mb { margin-bottom:1.25rem; } .mb-sm { margin-bottom:.75rem; }
-.txt2 { color:var(--txt-mid); } .txt3 { color:var(--txt-light); }
+.txt3 { color:var(--txt-light); }
 .fs-sm { font-size:.8rem; }
 .cond { font-family:var(--font-cond); }
 .disp { font-family:var(--font-disp); }
@@ -481,7 +466,7 @@ body { padding-bottom: 64px; }
   box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 .wbtn:hover { border-color: var(--orange); color: var(--orange); }
-.wk-lbl { flex:1; text-align:center; font-family:var(--font-disp); font-size:1.2rem; letter-spacing:.06em; color:var(--txt-dark); }
+.wk-lbl { flex:1; text-align:center; font-family:var(--font-cond); font-size:.85rem; font-weight:800; letter-spacing:.06em; color:var(--txt-mid); }
 
 .game-card {
   background: #fff; border-radius: var(--r);
@@ -522,7 +507,7 @@ body { padding-bottom: 64px; }
 .gc-role { font-family:var(--font-cond); font-size:.65rem; font-weight:800; letter-spacing:.08em; color:var(--txt-light); min-width:34px; text-transform:uppercase; }
 .gc-name { font-size:.8rem; color:var(--txt-mid); }
 .gc-name-sep { color: var(--warm3); }
-.gc-staff { display:flex; gap:.4rem; align-items:baseline; }
+.gc-staff { display:flex; gap:.4rem; align-items:flex-start; }
 .gc-win { font-size: .7rem; margin-right: .1rem; }
 
 /* ═══════════════════════════════════
@@ -557,20 +542,11 @@ body { padding-bottom: 64px; }
   position:relative; overflow:hidden; border-radius:20px; margin-bottom:1.5rem;
   min-height:160px;
 }
-.dt-hero-img {
-  position:absolute; inset:0;
-  background:
-    linear-gradient(135deg, rgba(15,27,45,.93) 0%, rgba(20,36,62,.8) 50%, rgba(249,106,26,.25) 100%),
-    url('https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=1000&q=75') center/cover no-repeat;
-}
 .dt-hero-content { position:relative; z-index:2; padding:2rem 2.5rem; }
 .dt-hero-content h2 { font-family:var(--font-hero); font-size:2.8rem; color:#fff; line-height:1; margin-bottom:.2rem; text-shadow:0 2px 8px rgba(0,0,0,.4); }
 .dt-hero-content h2 span { color:var(--orange2); }
 .dt-hero-content p { font-family:var(--font-cond); font-size:.82rem; color:rgba(255,255,255,.85); letter-spacing:.04em; text-shadow:0 1px 4px rgba(0,0,0,.3); }
 .dt-hero-content .eyebrow { color:#fff !important; text-shadow:0 1px 4px rgba(0,0,0,.3); }
-.dt-title { font-family:var(--font-hero); font-size:2.8rem; color:#fff; line-height:1; margin-bottom:.2rem; }
-.dt-title span { color:var(--orange2); }
-.dt-sub { font-family:var(--font-cond); font-size:.82rem; color:rgba(255,255,255,.6); letter-spacing:.04em; margin-bottom:1rem; }
 .dt-chips { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
 .dt-chips .badge { border:none; font-weight:900; text-shadow:0 1px 3px rgba(0,0,0,.15); }
 .dt-chips .badge.bn { background:rgba(25,118,210,.25); color:#90caf9; }
@@ -649,7 +625,6 @@ body { padding-bottom: 64px; }
 .rot-p { display:flex; align-items:center; gap:.55rem; padding:.38rem 0; border-bottom:1px solid var(--warm1); }
 .rot-p:last-child { border-bottom:none; }
 .rot-p-name { flex:1; font-size:.85rem; color:var(--txt-dark); }
-.rot-cnt { font-family:var(--font-disp); font-size:.78rem; color:var(--txt-light); }
 
 /* ═══════════════════════════════════
    HISTORY PAGE STYLES
@@ -834,7 +809,6 @@ body { padding-bottom: 64px; }
 .att-table tbody td { padding: .6rem .4rem; text-align: center; vertical-align: middle; }
 .att-table tbody td:first-child { text-align: left; padding-left: 1rem; }
 .pl-name { font-size: .88rem; font-weight: 700; color: var(--txt-dark); }
-.pl-num  { font-family: var(--font-cond); font-size: .65rem; color: var(--txt-light); margin-left: .3rem; }
 .att-summary { font-family: var(--font-cond); font-size: .68rem; color: var(--txt-light); min-width: 40px; }
 .att-pct { font-family: var(--font-disp); font-size: .95rem; font-weight: 900; color: var(--txt-dark); display: block; }
 .week-sep { border-left: 2px solid var(--warm2) !important; }
@@ -849,7 +823,6 @@ body { padding-bottom: 64px; }
 .att-table tbody tr.team-row-white  { background: rgba(158,158,158,.04); }
 .att-table tbody tr:hover { background: var(--warm1) !important; }
 .wk-group { background: var(--navy3) !important; color: rgba(255,255,255,.6) !important; letter-spacing: .08em; }
-.wk-group-span { font-family: var(--font-cond); font-size: .6rem; color: rgba(255,255,255,.4); font-weight: 700; }
 /* roster scroll arrows */
 .att-scroll-wrap { position:relative; }
 .att-scroll-arrow {
@@ -882,31 +855,7 @@ body { padding-bottom: 64px; }
 @media (max-width: 600px) { .matchup-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 380px) { .matchup-grid { grid-template-columns: 1fr; } }
 
-.mup-card {
-  background: #fff; border-radius: var(--r-sm);
-  box-shadow: 0 1px 6px rgba(15,27,45,.08), 0 0 0 1px rgba(15,27,45,.05);
-  padding: .8rem .9rem;
-}
-.mup-num {
-  font-family: var(--font-cond); font-size: .6rem; font-weight: 800;
-  letter-spacing: .1em; color: var(--txt-light); text-transform: uppercase; margin-bottom: .4rem;
-}
-.mup-matchup {
-  display: flex; align-items: center; gap: .5rem;
-  font-family: var(--font-disp); font-size: 1.1rem; letter-spacing: .04em;
-}
-.mup-vs { font-size: .6rem; color: var(--txt-light); }
-
-/* 隊伍色球員名輔助 — 用於賽程頁展開的工作人員名稱 */
-.pn-red    { color: #e53935; font-weight: 700; }
-.pn-black  { color: #4a4a4a; font-weight: 700; }
-.pn-blue   { color: #1976d2; font-weight: 700; }
-.pn-green  { color: #2e7d32; font-weight: 700; }
-.pn-yellow { color: #b38f00; font-weight: 700; }
-.pn-white  { color: #757575; font-weight: 700; }
-
 /* 工作人員列 spacing */
-.gc-staff { align-items: flex-start; }
 .gc-name  { line-height: 1.7; }
 
 /* ═══════════════════════════════════
@@ -924,10 +873,6 @@ body { padding-bottom: 64px; }
   box-shadow: 0 1px 4px rgba(0,0,0,.06); transition: border-color .15s;
 }
 .season-select:focus { outline: none; border-color: var(--orange); }
-.season-label {
-  font-family: var(--font-cond); font-size: .72rem; font-weight: 800;
-  letter-spacing: .1em; color: var(--txt-light); text-transform: uppercase;
-}
 .sr { transition: filter .12s; }
 .sr:hover td { filter: brightness(.96); }
 .sr td { border-bottom: 1px solid var(--warm1); }
@@ -963,16 +908,6 @@ body { padding-bottom: 64px; }
   animation: spin .7s linear infinite;
 }
 
-/* skeleton shimmer */
-@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-.skeleton {
-  background: linear-gradient(90deg, var(--warm1) 25%, var(--warm2) 50%, var(--warm1) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease infinite;
-  border-radius: var(--r-sm);
-}
-.skeleton-line { height: .85rem; margin-bottom: .5rem; border-radius: 4px; }
-.skeleton-line:last-child { width: 60%; }
 
 /* ═══════════════════════════════════
    BOXSCORE PAGE STYLES
@@ -1018,10 +953,6 @@ body { padding-bottom: 64px; }
 .bs-gc-num {
   font-family: var(--font-disp); font-size: .85rem; letter-spacing: .06em;
   color: var(--txt-light);
-}
-.bs-gc-rec {
-  font-family: var(--font-cond); font-size: .62rem; color: var(--txt-light);
-  letter-spacing: .04em; white-space: nowrap;
 }
 
 .bs-gc-matchup {
@@ -1149,12 +1080,6 @@ body { padding-bottom: 64px; }
   transition: background .15s, color .15s;
 }
 .bs-link-btn:hover { background: var(--warm2); color: var(--txt-dark); }
-
-/* wk-lbl 補充（schedule 頁也用相同 id） */
-.wk-lbl {
-  font-family: var(--font-cond); font-size: .85rem; font-weight: 800;
-  letter-spacing: .06em; color: var(--txt-mid); text-align: center; flex: 1;
-}
 
 /* ═══════════════════════════════════
    LEADERS PAGE STYLES
