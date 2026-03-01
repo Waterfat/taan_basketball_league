@@ -61,9 +61,9 @@
     if (game.staff && Object.keys(game.staff).length) {
       staffHtml = Object.entries(game.staff).map(([role, people]) => {
         const coloredNames = people.map(p => {
-          const m = p.match(/\(([^)]+)\)$/);
-          if (m) {
-            const tc = TEAM_CONFIG[m[1]] || {};
+          const team = detectTeam(p);
+          if (team) {
+            const tc = TEAM_CONFIG[team] || {};
             return `<span class="${tc.cls || ''}">${p}</span>`;
           }
           return p;

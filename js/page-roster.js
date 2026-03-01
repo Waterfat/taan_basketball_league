@@ -62,7 +62,7 @@
     const totalDone = team.players.reduce((acc, p) => acc + p.att.filter(v => v !== '?').length, 0);
     const teamPct = totalDone ? Math.round(totalPresent / totalDone * 100) : 0;
     const pctColor = teamPct >= 70 ? 'var(--green)' : teamPct >= 50 ? '#b38f00' : 'var(--red)';
-    const displayColor = cfg.color === '#b38f00' ? '#e6b800' : (cfg.color || '');
+    const displayColor = cfg.barColor || cfg.color || '';
 
     return `
       <div class="team-block" data-team="${team.id}">

@@ -14,15 +14,6 @@
     return isNaN(n) ? null : n;
   }
 
-  /* 解析球員姓名 + 隊伍：把 "(" 及右方字串全部去掉 */
-  function parsePlayer(cell) {
-    if (!cell) return { name: '', team: '' };
-    const s = String(cell).trim();
-    const name = s.replace(/\(.*$/, '').trim();
-    const team = detectTeam(s) || '';
-    return { name: name || s, team };
-  }
-
   /* 名字 span（套隊伍色） */
   function nameSpan(name, team) {
     if (!team || !TEAM_CONFIG[team]) return name;
@@ -84,7 +75,7 @@
       return { name, team, val };
     }
 
-    const MEDALS = ['🥇', '🥈', '🥉'];
+    // MEDALS 定義於 shared-app.js
 
     const cards = statRows.map((row, cardIdx) => {
       const label = (row[0] || '').trim();
@@ -158,7 +149,7 @@
       const team = detectTeam(row[teamCol]);
       const tc = team ? (TEAM_CONFIG[team] || {}) : {};
       const borderColor = tc.color || 'transparent';
-      const bg = tc.bg ? tc.bg.replace(/[\d.]+\)$/, '.08)') : '';
+      const bg = team ? getTeamBg(team, '.08') : '';
       const rowStyle = `border-left:3px solid ${borderColor}${bg ? `;background:${bg}` : ''}`;
 
       const cells = Array.from({ length: colCount }, (_, ci) => {

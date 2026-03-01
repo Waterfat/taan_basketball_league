@@ -200,7 +200,7 @@ function showSchedView(mode) { toggleSchedView(mode, 'view-matchup', 'view-order
 
 /** W/L dots 渲染（首頁 & 戰績榜共用） */
 function renderHistoryDots(history) {
-  if (!history || !history.length) return '';
+  if (!Array.isArray(history) || !history.length) return '';
   return history.map((h, i) => {
     const isLast = i === history.length - 1;
     const cls = h === 'W' ? 'wl-dot wl-w' : 'wl-dot wl-l';
@@ -407,7 +407,7 @@ function buildMatchupCard(m) {
   const hasTeams = m.home && m.away;
 
   let scoreHtml = '';
-  if (m.status === 'finished') {
+  if (m.status === 'finished' && m.homeScore != null && m.awayScore != null) {
     const winner = m.homeScore > m.awayScore ? m.home : m.away;
     scoreHtml = `
       <div class="hgc-score-row">

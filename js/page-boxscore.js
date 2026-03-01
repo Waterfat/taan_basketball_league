@@ -11,6 +11,16 @@
   let _data   = null; // { weeks, defaultIdx, season }
   let _wkIdx  = -1;   // 目前顯示的 weeks 陣列 index
 
+  /** 依 gameNum 排序比賽（未設場次的排後面） */
+  function sortByGameNum(games) {
+    return [...games].sort((a, b) => {
+      if (!a.gameNum && !b.gameNum) return 0;
+      if (!a.gameNum) return 1;
+      if (!b.gameNum) return -1;
+      return a.gameNum - b.gameNum;
+    });
+  }
+
   /* ════════════════════════════════
      射擊欄位格式化
      ════════════════════════════════ */
@@ -332,13 +342,7 @@
       return;
     }
 
-    // 依 gameNum 排序（未設場次的排後面）
-    const sorted = [...wk.games].sort((a, b) => {
-      if (!a.gameNum && !b.gameNum) return 0;
-      if (!a.gameNum) return 1;
-      if (!b.gameNum) return -1;
-      return a.gameNum - b.gameNum;
-    });
+    const sorted = sortByGameNum(wk.games);
 
     // 熱身賽警告（若已進入例行賽或季後賽）
     const hasLaterPhase = _data.weeks.some(w => w.phase === '例行賽' || w.phase === '季後賽');
@@ -439,12 +443,7 @@
         requestAnimationFrame(() => {
           const wk = _data.weeks[_wkIdx];
           if (!wk) return;
-          const sorted = [...wk.games].sort((a, b) => {
-            if (!a.gameNum && !b.gameNum) return 0;
-            if (!a.gameNum) return 1;
-            if (!b.gameNum) return -1;
-            return a.gameNum - b.gameNum;
-          });
+          const sorted = sortByGameNum(wk.games);
           const gameIdx = sorted.findIndex(g => g.gameNum === dlGame);
           if (gameIdx < 0) return;
           const cards = document.querySelectorAll('#bs-games .bs-gc');
