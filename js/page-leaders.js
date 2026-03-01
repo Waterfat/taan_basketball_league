@@ -14,22 +14,6 @@
     return isNaN(n) ? null : n;
   }
 
-  /* 從儲存格辨識隊名（支援 "黃", "黃隊", "黃偉訓(黃)", "黃偉訓(黃隊)" 格式） */
-  function detectTeam(cell) {
-    if (!cell) return null;
-    const s = String(cell).trim();
-    const norm = s.replace(/隊$/, '');
-    if (TEAM_CONFIG[norm]) return norm;
-    const m = s.match(/\(([^)]+)\)?$/);
-    if (m) {
-      const raw = m[1].trim();
-      const normRaw = raw.replace(/隊$/, '');
-      if (TEAM_CONFIG[normRaw]) return normRaw;
-      if (TEAM_CONFIG[raw]) return raw;
-    }
-    return null;
-  }
-
   /* 解析球員姓名 + 隊伍：把 "(" 及右方字串全部去掉 */
   function parsePlayer(cell) {
     if (!cell) return { name: '', team: '' };
@@ -241,10 +225,9 @@
       });
     } catch (err) {
       console.error('載入領先榜失敗:', err);
-      showError(container, '資料載入失敗，請稍後再試', 'loadLeaders');
+      showError(container, '資料載入失敗，請稍後再試', loadLeaders);
     }
   }
 
-  window.loadLeaders = loadLeaders;
   document.addEventListener('DOMContentLoaded', loadLeaders);
 })();

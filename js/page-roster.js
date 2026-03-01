@@ -178,12 +178,9 @@
       renderRoster('all');
     } catch (err) {
       console.error('載入 roster 資料失敗:', err);
-      showError(container, '名單資料載入失敗，請稍後再試', 'loadRoster');
+      showError(container, '名單資料載入失敗，請稍後再試', loadRoster);
     }
   }
-
-  // 暴露全域（供 retry 按鈕呼叫）
-  window.loadRoster = loadRoster;
 
   document.addEventListener('DOMContentLoaded', loadRoster);
 })();

@@ -103,19 +103,20 @@ function showLoading(container) {
  * 顯示錯誤狀態（含重試按鈕）
  * @param {HTMLElement|string} container - DOM 元素或 id
  * @param {string} msg - 錯誤訊息
- * @param {string} [retryFnName] - 重試函式名稱（全域函式），若不傳則不顯示重試按鈕
+ * @param {Function} [retryFn] - 重試函式，若不傳則不顯示重試按鈕
  */
-function showError(container, msg, retryFnName) {
+function showError(container, msg, retryFn) {
   const el = typeof container === 'string' ? document.getElementById(container) : container;
   if (!el) return;
-  const retryBtn = retryFnName
-    ? `<button class="retry-btn" onclick="${retryFnName}()">重試</button>`
-    : '';
+  const hasRetry = typeof retryFn === 'function';
   el.innerHTML = `
     <div class="state-msg state-error">
       <span>⚠️ ${msg}</span>
-      ${retryBtn}
+      ${hasRetry ? '<button class="retry-btn">重試</button>' : ''}
     </div>`;
+  if (hasRetry) {
+    el.querySelector('.retry-btn').addEventListener('click', retryFn);
+  }
 }
 
 /**
@@ -324,6 +325,112 @@ document.addEventListener('click', function(e) {
   if (el) playBtnClick();
 }, true);
 
+/* ══════════════════════════════════════
+   共用：事件匯流排（跨模組通訊）
+   ══════════════════════════════════════ */
+
+const AppEvents = {
+  _handlers: {},
+  on(event, handler) {
+    (this._handlers[event] || (this._handlers[event] = [])).push(handler);
+  },
+  off(event, handler) {
+    const arr = this._handlers[event];
+    if (arr) this._handlers[event] = arr.filter(fn => fn !== handler);
+  },
+  emit(event, ...args) {
+    (this._handlers[event] || []).forEach(fn => fn(...args));
+  },
+};
+
+/* ══════════════════════════════════════
+   共用：賽制相對週次計算
+   ══════════════════════════════════════ */
+
+/**
+ * 計算賽制相對週次（各賽制獨立從 1 開始）
+ * @param {Object} entry - { week|weekNum, phase }
+ * @param {Array} allEntries - 所有週次資料
+ */
+function getPhaseRelativeWeekNum(entry, allEntries) {
+  const entryWeek = entry.week ?? entry.weekNum;
+  let minWeek = entryWeek;
+  if (allEntries) {
+    for (const w of allEntries) {
+      if (w.type && w.type !== 'game') continue;
+      if (w.phase !== entry.phase) continue;
+      const wk = w.week ?? w.weekNum;
+      if (wk < minWeek) minWeek = wk;
+    }
+  }
+  return entryWeek - minWeek + 1;
+}
+
+/**
+ * 取得賽制週次標籤（如 "例行賽 · 第 3 週"）
+ */
+function getPhaseWeekLabel(entry, allEntries) {
+  if (!entry || (entry.type && entry.type !== 'game')) return '';
+  const relativeWeek = getPhaseRelativeWeekNum(entry, allEntries);
+  return `${entry.phase} · 第 ${relativeWeek} 週`;
+}
+
+/* ══════════════════════════════════════
+   共用：隊伍辨識
+   ══════════════════════════════════════ */
+
+/**
+ * 從儲存格辨識隊名（支援 "黃", "黃隊", "黃偉訓(黃)", "黃偉訓(黃隊)" 等格式）
+ */
+function detectTeam(cell) {
+  if (!cell) return null;
+  const s = String(cell).trim();
+  const norm = s.replace(/隊$/, '');
+  if (TEAM_CONFIG[norm]) return norm;
+  const m = s.match(/\(([^)]+)\)?$/);
+  if (m) {
+    const raw = m[1].trim();
+    const normRaw = raw.replace(/隊$/, '');
+    if (TEAM_CONFIG[normRaw]) return normRaw;
+    if (TEAM_CONFIG[raw]) return raw;
+  }
+  return null;
+}
+
+/* ══════════════════════════════════════
+   共用：對戰組合卡片
+   ══════════════════════════════════════ */
+
+function buildMatchupCard(m) {
+  const hc = TEAM_CONFIG[m.home] || {};
+  const ac = TEAM_CONFIG[m.away] || {};
+  const hasTeams = m.home && m.away;
+
+  let scoreHtml = '';
+  if (m.status === 'finished') {
+    const winner = m.homeScore > m.awayScore ? m.home : m.away;
+    scoreHtml = `
+      <div class="hgc-score-row">
+        <span class="hgc-s ${hc.cls}">${m.homeScore}</span>
+        <span class="hgc-colon">:</span>
+        <span class="hgc-s ${ac.cls}">${m.awayScore}</span>
+      </div>
+      <span class="badge bw" style="font-size:.62rem">${winner}隊勝</span>`;
+  } else if (!hasTeams) {
+    scoreHtml = '<div class="hgc-pending" style="color:var(--txt-light)">尚未公告</div>';
+  }
+
+  return `
+    <div class="hgc${m.status === 'upcoming' ? ' hgc-upcoming' : ''}">
+      <span class="hgc-num">組合 ${m.combo}</span>
+      <div class="hgc-matchup">
+        <span class="hgc-team ${hc.cls}">${hasTeams ? m.home + '隊' : '—'}</span>
+        <span class="hgc-vs">VS</span>
+        <span class="hgc-team ${ac.cls}">${hasTeams ? m.away + '隊' : '—'}</span>
+      </div>
+      ${scoreHtml}
+    </div>`;
+}
 
 /* ── Init on DOM ready ── */
 document.addEventListener('DOMContentLoaded', initNavigation);

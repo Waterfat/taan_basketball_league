@@ -92,11 +92,9 @@
       renderDragon(data);
     } catch (err) {
       console.error('載入龍虎榜資料失敗:', err);
-      showError(container, '龍虎榜資料載入失敗，請稍後再試', 'loadDragon');
+      showError(container, '龍虎榜資料載入失敗，請稍後再試', loadDragon);
     }
   }
-
-  window.loadDragon = loadDragon;
 
   document.addEventListener('DOMContentLoaded', loadDragon);
 })();

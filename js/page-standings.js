@@ -100,12 +100,9 @@
       renderStandings(data);
     } catch (err) {
       console.error('載入戰績資料失敗:', err);
-      showError(container, '戰績資料載入失敗，請稍後再試', 'loadStandings');
+      showError(container, '戰績資料載入失敗，請稍後再試', loadStandings);
     }
   }
-
-  // 暴露全域（供 retry 按鈕呼叫）
-  window.loadStandings = loadStandings;
 
   document.addEventListener('DOMContentLoaded', loadStandings);
 })();

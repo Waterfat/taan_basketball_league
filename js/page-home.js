@@ -192,29 +192,15 @@
       </div>`;
   }
 
-  function buildHomeMatchupCard(m) {
-    const hc = TEAM_CONFIG[m.home] || {};
-    const ac = TEAM_CONFIG[m.away] || {};
-    return `
-      <div class="hgc">
-        <span class="hgc-num">組合 ${m.combo}</span>
-        <div class="hgc-matchup">
-          <span class="hgc-team ${hc.cls}">${m.home}隊</span>
-          <span class="hgc-vs">VS</span>
-          <span class="hgc-team ${ac.cls}">${m.away}隊</span>
-        </div>
-      </div>`;
-  }
-
-  function renderHomeSchedule(weekData) {
+  function renderHomeSchedule(weekData, allWeeks) {
     const matchupGrid = document.getElementById('home-matchup-grid');
     const orderGrid = document.getElementById('home-order-grid');
 
     if (matchupGrid && weekData.matchups) {
-      matchupGrid.innerHTML = weekData.matchups.map(buildHomeMatchupCard).join('');
+      matchupGrid.innerHTML = weekData.matchups.map(buildMatchupCard).join('');
     }
     if (orderGrid && weekData.games) {
-      const relWeek = typeof getPhaseRelativeWeekNum === 'function' ? getPhaseRelativeWeekNum(weekData) : weekData.week;
+      const relWeek = getPhaseRelativeWeekNum(weekData, allWeeks);
       orderGrid.innerHTML = weekData.games.map(g => buildHomeGameCard(g, weekData.phase, relWeek)).join('');
       const hint = document.getElementById('home-order-hint');
       if (hint) hint.style.display = 'block';
@@ -224,10 +210,10 @@
     showSched(hasGames ? 'order' : 'matchup');
   }
 
-  function updateHomeSchedHeader(entry) {
+  function updateHomeSchedHeader(entry, allWeeks) {
     const container = document.getElementById('home-sched-header');
     if (!container) return;
-    const label = typeof getPhaseWeekLabel === 'function' ? getPhaseWeekLabel(entry) : '';
+    const label = getPhaseWeekLabel(entry, allWeeks);
     const dateEl = container.querySelector('.stb-date');
     const locEl = container.querySelector('.stb-loc');
     const weekEl = container.querySelector('.stb-week');
@@ -236,9 +222,11 @@
     if (weekEl) weekEl.textContent = `第 ${ApiConfig.currentSeason} 屆・` + label;
   }
 
-  // 暴露給 loadSchedule 使用（跨模組通訊）
-  window._renderHomeSchedule = renderHomeSchedule;
-  window._updateHomeSchedHeader = updateHomeSchedHeader;
+  // 接收賽程模組資料（跨模組通訊）
+  AppEvents.on('scheduleReady', (weekData, allWeeks) => {
+    renderHomeSchedule(weekData, allWeeks);
+    updateHomeSchedHeader(weekData, allWeeks);
+  });
 
   /* ── 渲染賽程標題區塊 ── */
   function renderScheduleHeader(data) {
@@ -266,19 +254,6 @@
     const btnO = container.querySelector('#btn-order');
     if (btnM) btnM.addEventListener('click', () => showSched('matchup'));
     if (btnO) btnO.addEventListener('click', () => showSched('order'));
-    // 預設 matchup active，loadSchedule 完成後會依資料覆蓋正確狀態
-    // 若 loadSchedule 已先完成，使用其計算的有效週次覆蓋 header
-    if (window._effectiveHomeEntry) {
-      const e = window._effectiveHomeEntry;
-      const dateEl = container.querySelector('.stb-date');
-      const locEl = container.querySelector('.stb-loc');
-      const weekEl = container.querySelector('.stb-week');
-      if (dateEl) dateEl.textContent = '📅 ' + e.date;
-      if (locEl) locEl.textContent = '📍 ' + e.venue;
-      if (weekEl && typeof getPhaseWeekLabel === 'function') {
-        weekEl.textContent = `第 ${ApiConfig.currentSeason} 屆・` + getPhaseWeekLabel(e);
-      }
-    }
   }
 
   /* ── Fetch & Init ── */
@@ -295,8 +270,6 @@
     // 首頁賽程區塊由 loadSchedule 負責渲染，等 home 資料快取填充後再呼叫
     if (typeof loadSchedule === 'function') loadSchedule();
   }
-
-  window.loadHome = loadHome;
 
   document.addEventListener('DOMContentLoaded', loadHome);
 })();

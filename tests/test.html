@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Unit Tests — 大安籃球聯盟</title>
+<style>
+  body { font-family: 'Menlo', monospace; padding: 2rem; background: #1a1a2e; color: #e0e0e0; }
+  h1 { color: #f9a225; margin-bottom: 1.5rem; }
+  .suite { margin-bottom: 1.5rem; }
+  .suite-name { font-weight: 700; font-size: 1.1rem; color: #8bb4f0; margin-bottom: .5rem; }
+  .pass { color: #4caf50; }
+  .fail { color: #e53935; }
+  .test { padding: .3rem 0; padding-left: 1rem; }
+  .summary { margin-top: 2rem; padding: 1rem; border-top: 2px solid #333; font-size: 1.2rem; }
+</style>
+</head>
+<body>
+<h1>Unit Tests</h1>
+<div id="results"></div>
+<div id="summary" class="summary"></div>
+
+<!-- Load source files (order matters) -->
+<script src="../shared-app.js"></script>
+<script src="../js/api.js"></script>
+
+<script src="tests.js"></script>
+</body>
+</html>

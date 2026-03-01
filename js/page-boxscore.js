@@ -26,16 +26,6 @@
   }
 
   /* ════════════════════════════════
-     賽制相對週次
-     ════════════════════════════════ */
-  function getPhaseRelativeWeek(wk) {
-    const minWeek = _data.weeks
-      .filter(w => w.phase === wk.phase)
-      .reduce((min, w) => Math.min(min, w.weekNum), wk.weekNum);
-    return wk.weekNum - minWeek + 1;
-  }
-
-  /* ════════════════════════════════
      球員列 HTML
      ════════════════════════════════ */
   function playerRowHtml(p, tc) {
@@ -377,7 +367,7 @@
   function updateHero(wk) {
     const el = document.getElementById('bs-hero-content');
     if (!el || !wk) return;
-    const relWeek = getPhaseRelativeWeek(wk);
+    const relWeek = getPhaseRelativeWeekNum(wk, _data.weeks);
     const label = `${wk.phase} · 第 ${relWeek} 週`;
     el.innerHTML = `
       <div class="sched-hero-left">
@@ -400,7 +390,7 @@
 
     if (label && _data.weeks[_wkIdx]) {
       const wk = _data.weeks[_wkIdx];
-      const relWeek = getPhaseRelativeWeek(wk);
+      const relWeek = getPhaseRelativeWeekNum(wk, _data.weeks);
       label.textContent = `${wk.phase} · 第 ${relWeek} 週`;
     }
   }
@@ -435,7 +425,7 @@
 
       if (dlPhase && dlRelWeek) {
         const idx = _data.weeks.findIndex(w =>
-          w.phase === dlPhase && getPhaseRelativeWeek(w) === dlRelWeek
+          w.phase === dlPhase && getPhaseRelativeWeekNum(w, _data.weeks) === dlRelWeek
         );
         _wkIdx = idx >= 0 ? idx : _data.defaultIdx;
       } else {
@@ -467,7 +457,7 @@
       }
     } catch (err) {
       console.error('載入對戰數據失敗:', err);
-      showError(container, '數據載入失敗，請稍後重試', 'loadBoxscore');
+      showError(container, '數據載入失敗，請稍後重試', loadBoxscore);
     }
   }
 

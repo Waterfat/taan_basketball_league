@@ -455,6 +455,17 @@ function parseMatchupCell(cell, combo) {
 }
 
 /* ── 解析輪值人員列 ── */
+
+/** Q~AC 13 欄輪值角色定義 */
+const ROTATION_ROLES = [
+  { label: '裁判', start: 0, count: 3 },
+  { label: '場務', start: 3, count: 3 },
+  { label: '攝影', start: 6, count: 1 },
+  { label: '器材', start: 7, count: 2 },
+  { label: '數據', start: 9, count: 1 },
+  { label: '其他', start: 10, count: 3 },
+];
+
 /** 解析 Q~AC 一列 → staff 物件 { 裁判:[], 場務:[], ... } */
 function parseRotationRow(row) {
   if (!row || !row.length) return {};
@@ -466,30 +477,15 @@ function parseRotationRow(row) {
     return p.name ? `${p.name}(${p.team})` : null;
   };
 
-  const collect = (start, count) => {
+  const staff = {};
+  ROTATION_ROLES.forEach(({ label, start, count }) => {
     const arr = [];
     for (let i = start; i < start + count; i++) {
       const v = fmt(i);
       if (v) arr.push(v);
     }
-    return arr;
-  };
-
-  // Q~AC 13 欄：裁判(0-2) 場務(3-5) 攝影(6) 器材(7-8) 數據(9) 其他(10-12)
-  const staff = {};
-  const referees = collect(0, 3);
-  const court   = collect(3, 3);
-  const photo   = collect(6, 1);
-  const equip   = collect(7, 2);
-  const dataCol = collect(9, 1);
-  const other   = collect(10, 3);
-
-  if (referees.length) staff['裁判'] = referees;
-  if (court.length)    staff['場務'] = court;
-  if (photo.length)    staff['攝影'] = photo;
-  if (equip.length)    staff['器材'] = equip;
-  if (dataCol.length)  staff['數據'] = dataCol;
-  if (other.length)    staff['其他'] = other;
+    if (arr.length) staff[label] = arr;
+  });
 
   return staff;
 }
@@ -718,120 +714,111 @@ function transformLeaders(tableRows, offRows, defRows, netRows) {
 /* ── 轉換：對戰數據（boxscore） ── */
 
 /**
- * 22 列為一場比賽的資料結構：
- *  [0] meta1  : A=第幾週標籤, B=週次, F=場次, J=賽制, S=主隊, V=客隊
- *  [1] meta2  : O=記錄人, S=主隊得分, V=客隊得分
- *  [2] 欄位標題列 (skip)
- *  [3] 子標題列 (skip)
- *  [4..20] 球員數據列，共 17 筆（主客並排）
- *  [21] 合計列
+ * Boxscore Sheets 結構常數
+ * 每場比賽佔 BLOCK_SIZE 列，主客隊資料並排
  */
-function transformBoxscore(rows) {
-  const BLOCK = 22;
-  const games = [];
+const BS_BLOCK_SIZE = 22;
+const BS_PLAYER_START = 4;    // 球員資料起始列 (block offset)
+const BS_PLAYER_END = 20;     // 球員資料結束列 (block offset)
+const BS_TOTALS_ROW = 21;     // 合計列 (block offset)
 
-  const num = (v) => {
-    if (!v || v === '#N/A') return 0;
-    const n = parseInt(v);
-    return isNaN(n) ? 0 : n;
+/** 主隊欄位偏移 */
+const BS_HOME = {
+  NAME: 0, FG2MISS: 1, FG2MADE: 2, FG3MISS: 4, FG3MADE: 5,
+  FTMISS: 7, FTMADE: 8, PTS: 10, OREB: 11, DREB: 12,
+  AST: 14, BLK: 15, STL: 16, TOV: 17, PF: 18, PLAYED: 19,
+};
+
+/** 客隊欄位偏移 */
+const BS_AWAY = {
+  NAME: 21, FG2MISS: 22, FG2MADE: 23, FG3MISS: 25, FG3MADE: 26,
+  FTMISS: 28, FTMADE: 29, PTS: 31, OREB: 32, DREB: 33,
+  AST: 35, BLK: 36, STL: 37, TOV: 38, PF: 39, PLAYED: 40,
+};
+
+/** 安全數字解析 */
+function bsNum(v) {
+  if (!v || v === '#N/A') return 0;
+  const n = parseInt(v);
+  return isNaN(n) ? 0 : n;
+}
+
+/** 安全字串解析 */
+function bsStr(v) {
+  return (!v || v === '#N/A') ? '' : String(v).trim();
+}
+
+/** 從一列中依欄位定義提取數據 */
+function parseStatCols(row, cols) {
+  const stats = {
+    fg2miss: bsNum(row[cols.FG2MISS]), fg2made: bsNum(row[cols.FG2MADE]),
+    fg3miss: bsNum(row[cols.FG3MISS]), fg3made: bsNum(row[cols.FG3MADE]),
+    ftmiss:  bsNum(row[cols.FTMISS]),  ftmade:  bsNum(row[cols.FTMADE]),
+    pts: bsNum(row[cols.PTS]),   oreb: bsNum(row[cols.OREB]),  dreb: bsNum(row[cols.DREB]),
+    ast: bsNum(row[cols.AST]),   blk:  bsNum(row[cols.BLK]),   stl:  bsNum(row[cols.STL]),
+    tov: bsNum(row[cols.TOV]),   pf:   bsNum(row[cols.PF]),
   };
-  const str = (v) => (!v || v === '#N/A') ? '' : String(v).trim();
+  stats.treb = stats.oreb + stats.dreb;
+  return stats;
+}
 
-  for (let i = 0; i + BLOCK <= rows.length; i += BLOCK) {
-    const b = rows.slice(i, i + BLOCK);
-    const m1 = b[0] || [];
-    const m2 = b[1] || [];
+/** 解析單場比賽的 22 列資料 */
+function parseGameBlock(block) {
+  const m1 = block[0] || [];
+  const m2 = block[1] || [];
 
-    const weekNum = num(m1[1]);   // col B
-    const gameNum = num(m1[5]);   // col F
-    const phase   = str(m1[9]);   // col J
-    const homeTeam = str(m1[18]); // col S
-    const awayTeam = str(m1[21]); // col V
+  const weekNum  = bsNum(m1[1]);   // col B
+  const gameNum  = bsNum(m1[5]);   // col F
+  const phase    = bsStr(m1[9]);   // col J
+  const homeTeam = bsStr(m1[18]);  // col S
+  const awayTeam = bsStr(m1[21]);  // col V
 
-    // 週次或場次右側數字有缺少 → 不計入統計
-    const countsForStats = weekNum > 0 && gameNum > 0;
-    if (!weekNum) continue;
+  const countsForStats = weekNum > 0 && gameNum > 0;
+  if (!weekNum) return null;
 
-    const recorder  = str(m2[14]);          // col O
-    const homeScore = parseInt(m2[18]) || null; // col S
-    const awayScore = parseInt(m2[21]) || null; // col V
-    const hasScores = homeScore !== null && awayScore !== null;
+  const recorder  = bsStr(m2[14]);
+  const homeScore = parseInt(m2[18]) || null;
+  const awayScore = parseInt(m2[21]) || null;
+  const hasScores = homeScore !== null && awayScore !== null;
 
-    // 合計列 (block index 21)
-    const totRow = b[21] || [];
-    const homeTot = {
-      fg2miss: num(totRow[1]),  fg2made: num(totRow[2]),
-      fg3miss: num(totRow[4]),  fg3made: num(totRow[5]),
-      ftmiss:  num(totRow[7]),  ftmade:  num(totRow[8]),
-      pts: num(totRow[10]), oreb: num(totRow[11]), dreb: num(totRow[12]),
-      ast: num(totRow[14]), blk: num(totRow[15]), stl: num(totRow[16]),
-      tov: num(totRow[17]), pf: num(totRow[18]),
-    };
-    homeTot.treb = homeTot.oreb + homeTot.dreb;
+  // 合計列
+  const totRow  = block[BS_TOTALS_ROW] || [];
+  const homeTot = parseStatCols(totRow, BS_HOME);
+  const awayTot = parseStatCols(totRow, BS_AWAY);
 
-    const awTot = totRow;
-    const awayTot = {
-      fg2miss: num(awTot[22]), fg2made: num(awTot[23]),
-      fg3miss: num(awTot[25]), fg3made: num(awTot[26]),
-      ftmiss:  num(awTot[28]), ftmade:  num(awTot[29]),
-      pts: num(awTot[31]), oreb: num(awTot[32]), dreb: num(awTot[33]),
-      ast: num(awTot[35]), blk: num(awTot[36]), stl: num(awTot[37]),
-      tov: num(awTot[38]), pf:  num(awTot[39]),
-    };
-    awayTot.treb = awayTot.oreb + awayTot.dreb;
+  // 球員列
+  const homePlayers = [];
+  const awayPlayers = [];
 
-    // 球員列 (block indices 4..20)
-    const homePlayers = [];
-    const awayPlayers = [];
+  for (let r = BS_PLAYER_START; r <= BS_PLAYER_END; r++) {
+    const row = block[r] || [];
 
-    for (let r = 4; r <= 20; r++) {
-      const row = b[r] || [];
-
-      // 主隊球員
-      const homeRaw = str(row[0]);  // col A
-      if (homeRaw) {
-        const { name, team } = parseSheetsName(homeRaw + ')'); // 補上遺漏的右括號
-        const played = !!str(row[19]);  // col T：出賽名單確認
-        homePlayers.push({
-          name, team, played: countsForStats && played,
-          fg2miss: num(row[1]),  fg2made: num(row[2]),
-          fg3miss: num(row[4]),  fg3made: num(row[5]),
-          ftmiss:  num(row[7]),  ftmade:  num(row[8]),
-          pts: num(row[10]), oreb: num(row[11]), dreb: num(row[12]),
-          ast: num(row[14]), blk: num(row[15]), stl: num(row[16]),
-          tov: num(row[17]), pf: num(row[18]),
-        });
-        const p = homePlayers[homePlayers.length - 1];
-        p.treb = p.oreb + p.dreb;
-      }
-
-      // 客隊球員
-      const awayRaw = str(row[21]); // col V
-      if (awayRaw) {
-        const { name, team } = parseSheetsName(awayRaw + ')');
-        const played = !!str(row[40]); // col AO：出賽名單確認
-        awayPlayers.push({
-          name, team, played: countsForStats && played,
-          fg2miss: num(row[22]), fg2made: num(row[23]),
-          fg3miss: num(row[25]), fg3made: num(row[26]),
-          ftmiss:  num(row[28]), ftmade:  num(row[29]),
-          pts: num(row[31]), oreb: num(row[32]), dreb: num(row[33]),
-          ast: num(row[35]), blk: num(row[36]), stl: num(row[37]),
-          tov: num(row[38]), pf:  num(row[39]),
-        });
-        const p = awayPlayers[awayPlayers.length - 1];
-        p.treb = p.oreb + p.dreb;
-      }
+    const homeRaw = bsStr(row[BS_HOME.NAME]);
+    if (homeRaw) {
+      const { name, team } = parseSheetsName(homeRaw + ')');
+      const played = !!bsStr(row[BS_HOME.PLAYED]);
+      const stats = parseStatCols(row, BS_HOME);
+      homePlayers.push({ name, team, played: countsForStats && played, ...stats });
     }
 
-    games.push({
-      weekNum, gameNum, phase, homeTeam, awayTeam,
-      homeScore, awayScore, recorder, hasScores, countsForStats,
-      homePlayers, awayPlayers, homeTot, awayTot,
-    });
+    const awayRaw = bsStr(row[BS_AWAY.NAME]);
+    if (awayRaw) {
+      const { name, team } = parseSheetsName(awayRaw + ')');
+      const played = !!bsStr(row[BS_AWAY.PLAYED]);
+      const stats = parseStatCols(row, BS_AWAY);
+      awayPlayers.push({ name, team, played: countsForStats && played, ...stats });
+    }
   }
 
-  // 依 (phase, weekNum) 分組
+  return {
+    weekNum, gameNum, phase, homeTeam, awayTeam,
+    homeScore, awayScore, recorder, hasScores, countsForStats,
+    homePlayers, awayPlayers, homeTot, awayTot,
+  };
+}
+
+/** 將解析後的比賽依 (phase, weekNum) 分組並排序 */
+function groupGamesByWeek(games) {
   const PHASE_ORDER = { '熱身賽': 0, '例行賽': 1, '季後賽': 2 };
   const groupMap = {};
   games.forEach(g => {
@@ -842,10 +829,21 @@ function transformBoxscore(rows) {
     groupMap[key].games.push(g);
   });
 
-  const weeks = Object.values(groupMap).sort((a, b) => {
+  return Object.values(groupMap).sort((a, b) => {
     const po = (PHASE_ORDER[a.phase] ?? 9) - (PHASE_ORDER[b.phase] ?? 9);
     return po !== 0 ? po : a.weekNum - b.weekNum;
   });
+}
+
+function transformBoxscore(rows) {
+  const games = [];
+
+  for (let i = 0; i + BS_BLOCK_SIZE <= rows.length; i += BS_BLOCK_SIZE) {
+    const game = parseGameBlock(rows.slice(i, i + BS_BLOCK_SIZE));
+    if (game) games.push(game);
+  }
+
+  const weeks = groupGamesByWeek(games);
 
   // 預設顯示最新有比分資料的週次
   let defaultIdx = weeks.length - 1;
