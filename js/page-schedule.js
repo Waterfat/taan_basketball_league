@@ -14,15 +14,6 @@
   /* ═══════════════════════════════
      Status helpers
      ═══════════════════════════════ */
-  function gameStatusBadge(game) {
-    if (game.status === 'finished') {
-      const winner = game.homeScore > game.awayScore ? game.home : game.away;
-      return `<span class="badge bw" style="font-size:.62rem">${winner}隊勝</span>`;
-    }
-    if (game.status === 'live') return '<span class="badge bs" style="font-size:.62rem;animation:pulse 2s infinite">🔴 LIVE</span>';
-    return '';
-  }
-
   function gameScoreHtml(game) {
     if (game.status === 'finished' || game.status === 'live') {
       const hc = TEAM_CONFIG[game.home] || {};

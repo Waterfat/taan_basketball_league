@@ -391,10 +391,6 @@ body { padding-bottom: 64px; }
 @media (max-width: 400px) {
   .trr-th-pct, .trr-pct { display: none; }
 }
-@media (max-width: 500px) {
-  .trr-prog-wrap { display: none; }
-  .trr-record { min-width: 50px; font-size: .75rem; }
-}
 
 /* home bottom grid */
 .home-bottom-grid {
@@ -505,7 +501,7 @@ body { padding-bottom: 64px; }
 }
 .game-card.open .gc-body { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem .75rem; padding-top: .85rem; }
 .gc-role { font-family:var(--font-cond); font-size:.65rem; font-weight:800; letter-spacing:.08em; color:var(--txt-light); min-width:34px; text-transform:uppercase; }
-.gc-name { font-size:.8rem; color:var(--txt-mid); }
+.gc-name { font-size:.8rem; color:var(--txt-mid); line-height:1.7; }
 .gc-name-sep { color: var(--warm3); }
 .gc-staff { display:flex; gap:.4rem; align-items:flex-start; }
 .gc-win { font-size: .7rem; margin-right: .1rem; }
@@ -855,8 +851,6 @@ body { padding-bottom: 64px; }
 @media (max-width: 600px) { .matchup-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 380px) { .matchup-grid { grid-template-columns: 1fr; } }
 
-/* 工作人員列 spacing */
-.gc-name  { line-height: 1.7; }
 
 /* ═══════════════════════════════════
    STATS PAGE — EXTRA STYLES

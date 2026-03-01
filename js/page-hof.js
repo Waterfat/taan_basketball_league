@@ -110,13 +110,6 @@
       renderPodium('hof-pod-avg', data.avgStats.podium.top3, data.avgStats.podium.unit);
     }
 
-    // HoF tab 事件委派
-    container.addEventListener('click', (e) => {
-      const tab = e.target.closest('.htab');
-      if (!tab) return;
-      const panelId = tab.dataset.panel;
-      if (panelId) switchHof(tab, panelId);
-    });
   }
 
   /* ── Fetch & Init ── */
@@ -136,11 +129,21 @@
       renderHof(data);
     } catch (err) {
       console.error('載入名人堂資料失敗:', err);
-      showError(container, '名人堂資料載入失敗，請稍後再試', 'loadHof');
+      showError(container, '名人堂資料載入失敗，請稍後再試', loadHof);
     }
   }
 
-  window.loadHof = loadHof;
-
-  document.addEventListener('DOMContentLoaded', loadHof);
+  document.addEventListener('DOMContentLoaded', () => {
+    // HoF tab 事件委派（綁定一次，避免 retry 累積）
+    const container = document.getElementById('hof-content');
+    if (container) {
+      container.addEventListener('click', (e) => {
+        const tab = e.target.closest('.htab');
+        if (!tab) return;
+        const panelId = tab.dataset.panel;
+        if (panelId) switchHof(tab, panelId);
+      });
+    }
+    loadHof();
+  });
 })();

@@ -94,11 +94,9 @@
       renderRotation(data);
     } catch (err) {
       console.error('載入輪值資料失敗:', err);
-      showError(container, '輪值資料載入失敗，請稍後再試', 'loadRotation');
+      showError(container, '輪值資料載入失敗，請稍後再試', loadRotation);
     }
   }
-
-  window.loadRotation = loadRotation;
 
   document.addEventListener('DOMContentLoaded', loadRotation);
 })();

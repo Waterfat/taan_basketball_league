@@ -94,12 +94,9 @@
       stats_renderAll(Object.keys(_seasons).sort((a, b) => Number(b) - Number(a))[0]);
     } catch (err) {
       console.error('載入 stats 資料失敗:', err);
-      showError(contentEl, '數據資料載入失敗，請稍後再試', 'loadStats');
+      showError(contentEl, '數據資料載入失敗，請稍後再試', loadStats);
     }
   }
-
-  // 暴露全域（供 retry 呼叫）
-  window.loadStats = loadStats;
 
   document.addEventListener('DOMContentLoaded', () => {
     _statsPanelsHtml = document.getElementById('stats-content').innerHTML;

@@ -245,8 +245,6 @@ function rowBgStyle(teamName) {
 
 const MEDALS = ['🥇','🥈','🥉'];
 const MEDAL_CLS = ['p1','p2','p3'];
-const POD_VAL_CLS = ['g','s','b'];
-
 /**
  * 渲染 podium（前三名）到指定容器
  * @param {string} containerId - podium 容器的 id
@@ -254,6 +252,7 @@ const POD_VAL_CLS = ['g','s','b'];
  * @param {string} unit - 單位文字（如 '場均得分'）
  */
 function renderPodium(containerId, top3, unit) {
+  if (!top3 || top3.length < 3) return;
   // podium 排列順序：左=2nd, 中=1st, 右=3rd
   const order = [top3[1], top3[0], top3[2]];
   const podOrder = [1, 0, 2];

@@ -204,8 +204,16 @@
 
       container.innerHTML = html ||
         '<div class="state-msg"><span>📋 尚無領先榜資料</span></div>';
+    } catch (err) {
+      console.error('載入領先榜失敗:', err);
+      showError(container, '資料載入失敗，請稍後再試', loadLeaders);
+    }
+  }
 
-      // 展開/收合事件
+  document.addEventListener('DOMContentLoaded', () => {
+    // 展開/收合事件委派（綁定一次，避免 retry 累積）
+    const container = document.getElementById('leaders-content');
+    if (container) {
       container.addEventListener('click', e => {
         const btn = e.target.closest('.ldr-more-btn');
         if (!btn) return;
@@ -214,11 +222,7 @@
         const isOpen = moreEl.classList.toggle('open');
         btn.textContent = isOpen ? '收起 ▲' : '詳細 ▼';
       });
-    } catch (err) {
-      console.error('載入領先榜失敗:', err);
-      showError(container, '資料載入失敗，請稍後再試', loadLeaders);
     }
-  }
-
-  document.addEventListener('DOMContentLoaded', loadLeaders);
+    loadLeaders();
+  });
 })();

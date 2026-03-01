@@ -167,6 +167,8 @@
 
   /* ── Fetch & Init ── */
   async function loadRoster() {
+    const subtitle = document.getElementById('roster-subtitle');
+    if (subtitle) subtitle.textContent = `第 ${ApiConfig.currentSeason} 屆 · 六隊名單 · 本季出席紀錄`;
     buildFilterChips();
     const container = document.getElementById('roster-list');
     showLoading(container);
