@@ -433,3 +433,10 @@ function buildMatchupCard(m) {
 
 /* ── Init on DOM ready ── */
 document.addEventListener('DOMContentLoaded', initNavigation);
+
+/* ── PWA Service Worker 註冊 ── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
