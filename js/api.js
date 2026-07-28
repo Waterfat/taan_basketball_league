@@ -462,8 +462,9 @@ function transformStandings(standingsRows, meta, allWeeks) {
 function transformDragon(dragonRows) {
   const players = dragonRows.map(row => {
     const { name, team } = parseSheetsName(row[1]);
-    const att = parseInt(row[3]) || 0;
-    const duty = parseInt(row[4]) || 0;
+    // 欄位順序依表頭：D名次 E球員 F Sum G輪值 H出席
+    const duty = parseInt(row[3]) || 0;
+    const att = parseInt(row[4]) || 0;
     const totalFloat = parseFloat(row[2]) || 0;
     const intTotal = Math.floor(totalFloat);
     const mop = Math.max(0, intTotal - att - duty);

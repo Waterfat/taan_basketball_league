@@ -234,9 +234,10 @@
   suite('transformDragon');
 
   test('正確解析龍虎榜資料', () => {
+    // 欄位順序依表頭：名次, 球員, Sum, 輪值, 出席
     const rows = [
-      ['1', '王小明(紅)', '10', '5', '3'],
-      ['2', '李大華(藍)', '8', '4', '2'],
+      ['1', '王小明(紅)', '10', '3', '5'],
+      ['2', '李大華(藍)', '8', '2', '4'],
     ];
     const data = transformDragon(rows);
     assertEqual(data.players.length, 2);
