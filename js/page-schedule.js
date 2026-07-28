@@ -2,7 +2,7 @@
    PAGE: SCHEDULE — 賽程（含週次導航）
    依賴：shared-app.js (TEAM_CONFIG, showLoading, showError, showEmpty, toggleCard, showSchedView)
    依賴：js/api.js (api.getSchedule)
-   資料：datas!D87:N113 + datas!Q88:AC177
+   資料：datas「#總賽程」+「#每週輪值」錨點區塊（範圍由 api.js 錨點定位動態解析）
 ══════════════════════════════════ */
 
 (function() {

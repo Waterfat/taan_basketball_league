@@ -2,7 +2,7 @@
    PAGE: LEADERS — 領先榜
    依賴：shared-app.js (TEAM_CONFIG, showLoading, showError, renderHero)
    依賴：js/api.js (api.getLeaders)
-   資料：datas!D212:N224, D227:K234, D237:K244, D247:K254
+   資料：datas「#領先榜」+「#球隊數據」+「#球隊防守數據」+「#數據統計差」錨點區塊（範圍由 api.js 錨點定位動態解析）
 ══════════════════════════════════ */
 
 (function () {

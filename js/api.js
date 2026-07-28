@@ -12,12 +12,16 @@ const ApiConfig = {
   SHEET_ID: '15GWnfG8yWa7DbPkLY8N3HSs7kBFHCa_l2oYx9Ye8H5c',
   API_KEY: 'AIzaSyC5F-TCj4KzsifU3PoNUl5HPvFvRv7TST4',
 
-  /** Sheets 資料範圍（對應 APIMgr.ts 的 getURL 呼叫） */
+  /**
+   * Sheets 資料範圍 — 預設值（fallback）
+   * 頁面載入時 ensureRanges() 會依試算表內「#錨點」文字動態解析實際範圍並覆寫；
+   * 錨點找不到時才使用這裡的寫死座標。boxscore 在獨立分頁、無錨點，永遠固定。
+   */
   sheetsRanges: {
     home:         'datas!D2:M7',
     dragon:       'datas!D13:L76',
     standings:    'datas!P2:T7',
-    roster:       'datas!O19:AH83',
+    roster:       'datas!O19:AH88',
     dates:        'datas!P13:AG13',
     allSchedule:  'datas!D87:N113',
     allRotation:  'datas!Q88:AC177',
@@ -85,6 +89,116 @@ function setCache(key, data) {
 }
 
 /* ═══════════════════════════════════════
+   錨點定位 — 依試算表「#錨點」文字動態解析資料範圍
+   ═══════════════════════════════════════ */
+
+/** 錨點掃描欄（一次 batchGet 抓四欄文字） */
+const ANCHOR_SCAN_COLS = {
+  D: 'datas!D1:D400',
+  O: 'datas!O1:O200',
+  P: 'datas!P1:P10',
+  Q: 'datas!Q1:Q120',
+};
+
+/**
+ * 各資料區塊的錨點規則：col 欄找到 text 所在列 a 後，make(a, helpers) 組出範圍。
+ * helpers.find(col, text, from)  → 從 from 列起找文字，回傳列號或 null
+ * helpers.scanEnd(col, from)     → 從 from 列起連續非空的最後一列
+ */
+const ANCHOR_RULES = {
+  home:         { col: 'D', text: '#即時賽程',     make: a => `datas!D${a + 1}:M${a + 6}` },
+  standings:    { col: 'P', text: '#球隊戰績',     make: a => `datas!P${a + 1}:T${a + 6}` },
+  dragon:       { col: 'D', text: '#積分排名資料', make: (a, h) => {
+    const end = h.scanEnd('D', a + 2);
+    return end >= a + 2 ? `datas!D${a + 2}:L${end}` : null;
+  } },
+  dates:        { col: 'O', text: '#賽程日期',     make: a => `datas!P${a + 2}:AG${a + 2}` },
+  roster:       { col: 'O', text: '#出席資料',     make: (a, h) => {
+    const end = h.find('O', '紅色為讀取範圍', a + 1);
+    return end ? `datas!O${a + 1}:AH${end - 1}` : null;
+  } },
+  allSchedule:  { col: 'D', text: '#總賽程',       make: (a, h) => {
+    const next = h.find('D', '#對戰組合', a + 1);
+    return next ? `datas!D${a + 1}:N${next - 1}` : null;
+  } },
+  // ponytail: 輪值固定抓 180 列（30 週 × 6 場）上限，尾端空列 API 自動裁掉；賽季超過 30 週再擴
+  allRotation:  { col: 'Q', text: '#每週輪值',     make: a => `datas!Q${a + 2}:AC${a + 181}` },
+  allMatchups:  { col: 'D', text: '#對戰組合',     make: (a, h) => {
+    const end = h.scanEnd('D', a + 1);
+    return end >= a + 1 ? `datas!D${a + 1}:F${end}` : null;
+  } },
+  leadersTable: { col: 'D', text: '#領先榜',       make: a => `datas!D${a + 1}:N${a + 13}` },
+  teamOffense:  { col: 'D', text: '#球隊數據',     make: a => `datas!D${a + 1}:K${a + 8}` },
+  teamDefense:  { col: 'D', text: '#球隊防守數據', make: a => `datas!D${a + 1}:K${a + 8}` },
+  teamNet:      { col: 'D', text: '#數據統計差',   make: a => `datas!D${a + 1}:K${a + 8}` },
+};
+
+/**
+ * 純函式：由錨點欄內容解析各區塊範圍。
+ * cols = { D: ['#即時賽程', '', ...], O: [...], ... }（index 0 = 第 1 列，值已 trim）
+ * 回傳 { rangeName: 'datas!X#:Y#' }，找不到錨點的 key 不出現（沿用預設）。
+ */
+function resolveAnchorRanges(cols) {
+  const find = (col, text, from = 1) => {
+    const arr = cols[col] || [];
+    for (let i = from - 1; i < arr.length; i++) {
+      if (arr[i] === text) return i + 1;
+    }
+    return null;
+  };
+  const scanEnd = (col, from) => {
+    const arr = cols[col] || [];
+    let r = from;
+    while (r <= arr.length && arr[r - 1] !== '') r++;
+    return r - 1;
+  };
+
+  const out = {};
+  Object.keys(ANCHOR_RULES).forEach(key => {
+    const rule = ANCHOR_RULES[key];
+    const a = find(rule.col, rule.text);
+    const range = a ? rule.make(a, { find, scanEnd }) : null;
+    if (range) {
+      out[key] = range;
+    } else {
+      console.warn(`[api] 找不到錨點 ${rule.text}，${key} 沿用預設範圍`);
+    }
+  });
+  return out;
+}
+
+let _rangesPromise = null;
+
+/** 確保 sheetsRanges 已依錨點解析（每次頁面載入只抓一次；失敗則沿用預設範圍） */
+function ensureRanges() {
+  if (!USE_SHEETS) return Promise.resolve();
+  if (!_rangesPromise) {
+    _rangesPromise = (async () => {
+      const colKeys = Object.keys(ANCHOR_SCAN_COLS);
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), ApiConfig.timeout);
+      try {
+        const url = sheetsBatchUrl(colKeys.map(k => ANCHOR_SCAN_COLS[k]));
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(timer);
+        if (!res.ok) throw new Error(`Sheets HTTP ${res.status}`);
+        const json = await res.json();
+        const cols = {};
+        colKeys.forEach((k, i) => {
+          const values = (json.valueRanges && json.valueRanges[i] && json.valueRanges[i].values) || [];
+          cols[k] = values.map(row => (row && row[0] != null) ? String(row[0]).trim() : '');
+        });
+        Object.assign(ApiConfig.sheetsRanges, resolveAnchorRanges(cols));
+      } catch (err) {
+        clearTimeout(timer);
+        console.warn('[api] 錨點定位失敗，沿用預設範圍:', err.message);
+      }
+    })();
+  }
+  return _rangesPromise;
+}
+
+/* ═══════════════════════════════════════
    Google Sheets API 工具
    ═══════════════════════════════════════ */
 
@@ -99,8 +213,10 @@ function sheetsBatchUrl(ranges) {
   return `https://sheets.googleapis.com/v4/spreadsheets/${ApiConfig.SHEET_ID}/values:batchGet?${params}&key=${ApiConfig.API_KEY}`;
 }
 
-/** 抓取單一 Sheets 範圍，回傳 2D 陣列 */
-async function fetchSheetsRange(range) {
+/** 抓取單一 Sheets 範圍（傳入 sheetsRanges 的 key 名稱），回傳 2D 陣列 */
+async function fetchSheetsRange(rangeName) {
+  await ensureRanges();
+  const range = ApiConfig.sheetsRanges[rangeName] || rangeName;
   const cached = getCached('range:' + range);
   if (cached) return cached;
 
@@ -123,6 +239,7 @@ async function fetchSheetsRange(range) {
 
 /** 批次抓取多個 Sheets 範圍，回傳 { rangeName: 2D陣列 } */
 async function fetchSheetsBatch(rangeNames) {
+  await ensureRanges();
   // 檢查快取，只抓未快取的
   const result = {};
   const uncached = [];
@@ -899,7 +1016,7 @@ const api = {
     if (cached) return cached;
 
     try {
-      const rows = await fetchSheetsRange(ApiConfig.sheetsRanges.dragon);
+      const rows = await fetchSheetsRange('dragon');
       const data = transformDragon(rows);
       setCache('ep:dragon', data);
       return data;
@@ -980,7 +1097,7 @@ const api = {
     const cached = getCached('ep:boxscore');
     if (cached) return cached;
     try {
-      const rows = await fetchSheetsRange(ApiConfig.sheetsRanges.boxscore);
+      const rows = await fetchSheetsRange('boxscore');
       const data = transformBoxscore(rows);
       setCache('ep:boxscore', data);
       return data;
@@ -997,10 +1114,10 @@ const api = {
     if (cached) return cached;
     try {
       const [tableRows, offRows, defRows, netRows] = await Promise.all([
-        fetchSheetsRange(ApiConfig.sheetsRanges.leadersTable),
-        fetchSheetsRange(ApiConfig.sheetsRanges.teamOffense),
-        fetchSheetsRange(ApiConfig.sheetsRanges.teamDefense),
-        fetchSheetsRange(ApiConfig.sheetsRanges.teamNet),
+        fetchSheetsRange('leadersTable'),
+        fetchSheetsRange('teamOffense'),
+        fetchSheetsRange('teamDefense'),
+        fetchSheetsRange('teamNet'),
       ]);
       const data = transformLeaders(tableRows, offRows, defRows, netRows);
       setCache('ep:leaders', data);

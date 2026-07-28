@@ -364,6 +364,90 @@
   });
 
   /* ══════════════════════════════════════
+     resolveAnchorRanges（錨點定位）
+     ══════════════════════════════════════ */
+  suite('resolveAnchorRanges');
+
+  /** 建立模擬錨點欄：依 { 列號: 文字 } 產生欄陣列 */
+  function makeCol(cells, len) {
+    const arr = new Array(len).fill('');
+    Object.keys(cells).forEach(r => { arr[r - 1] = cells[r]; });
+    return arr;
+  }
+
+  /** 目前試算表的錨點配置（未插列狀態） */
+  function currentCols() {
+    const D = makeCol({
+      1: '#即時賽程', 11: '#積分排名資料', 86: '#總賽程',
+      116: '#對戰組合', 211: '#領先榜', 226: '#球隊數據',
+      236: '#球隊防守數據', 246: '#數據統計差',
+    }, 400);
+    for (let r = 13; r <= 76; r++) D[r - 1] = String(r - 12);   // 龍虎榜名次
+    for (let r = 117; r <= 206; r++) D[r - 1] = '藍';            // 對戰組合隊色
+    const O = makeCol({ 11: '#賽程日期', 18: '#出席資料', 84: '紅色為讀取範圍' }, 200);
+    for (let r = 19; r <= 82; r++) O[r - 1] = '球員' + r;
+    const P = makeCol({ 1: '#球隊戰績' }, 10);
+    const Q = makeCol({ 86: '#每週輪值' }, 120);
+    return { D, O, P, Q };
+  }
+
+  test('目前表格 → 解析出全部 12 個範圍', () => {
+    const ranges = resolveAnchorRanges(currentCols());
+    assertEqual(Object.keys(ranges).length, 12);
+    assertEqual(ranges.home, 'datas!D2:M7');
+    assertEqual(ranges.standings, 'datas!P2:T7');
+    assertEqual(ranges.dragon, 'datas!D13:L76');
+    assertEqual(ranges.dates, 'datas!P13:AG13');
+    assertEqual(ranges.roster, 'datas!O19:AH83');
+    assertEqual(ranges.allSchedule, 'datas!D87:N115');
+    assertEqual(ranges.allRotation, 'datas!Q88:AC267');
+    assertEqual(ranges.allMatchups, 'datas!D117:F206');
+    assertEqual(ranges.leadersTable, 'datas!D212:N224');
+    assertEqual(ranges.teamOffense, 'datas!D227:K234');
+    assertEqual(ranges.teamDefense, 'datas!D237:K244');
+    assertEqual(ranges.teamNet, 'datas!D247:K254');
+  });
+
+  test('出席區插 5 列 → 下方所有區塊自動位移', () => {
+    const c = currentCols();
+    // 模擬在第 83 列處插 5 列：O 欄 83 起下移、D/Q 欄 86 起下移
+    c.O.splice(82, 0, '', '', '', '', '');
+    c.D.splice(82, 0, '', '', '', '', '');
+    c.Q.splice(82, 0, '', '', '', '', '');
+    const ranges = resolveAnchorRanges(c);
+    assertEqual(ranges.roster, 'datas!O19:AH88', '出席表結尾跟著標記位移');
+    assertEqual(ranges.allSchedule, 'datas!D92:N120');
+    assertEqual(ranges.allRotation, 'datas!Q93:AC272');
+    assertEqual(ranges.allMatchups, 'datas!D122:F211');
+    assertEqual(ranges.leadersTable, 'datas!D217:N229');
+    assertEqual(ranges.home, 'datas!D2:M7', '插列點上方的區塊不動');
+    assertEqual(ranges.dragon, 'datas!D13:L76', '插列點上方的區塊不動');
+  });
+
+  test('出席表加人（標記下移）→ 結尾自動延伸', () => {
+    const c = currentCols();
+    c.O[82] = '新球員83';                       // 原本空的 83 列補人
+    c.O.splice(83, 0, '新球員84', '新球員85');   // 再插兩人，標記移到 86
+    const ranges = resolveAnchorRanges(c);
+    assertEqual(ranges.roster, 'datas!O19:AH85');
+  });
+
+  test('錨點缺失 → 該區塊不出現在結果（沿用預設）', () => {
+    const c = currentCols();
+    c.D[85] = '';   // 拿掉 #總賽程
+    const ranges = resolveAnchorRanges(c);
+    assert(!ranges.allSchedule, '總賽程缺錨點');
+    assert(ranges.roster, '其他區塊不受影響');
+  });
+
+  test('出席資料缺結尾標記 → roster 沿用預設', () => {
+    const c = currentCols();
+    c.O[83] = '';   // 拿掉「紅色為讀取範圍」
+    const ranges = resolveAnchorRanges(c);
+    assert(!ranges.roster);
+  });
+
+  /* ══════════════════════════════════════
      Summary
      ══════════════════════════════════════ */
   const total = passed + failed;

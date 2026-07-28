@@ -3,7 +3,7 @@
    策略：network-first（優先連網取最新資料，離線才用快取）
    ══════════════════════════════════════ */
 
-const CACHE_NAME = 'taan-basketball-v1';
+const CACHE_NAME = 'taan-basketball-v2';
 
 const STATIC_ASSETS = [
   './index.html',
