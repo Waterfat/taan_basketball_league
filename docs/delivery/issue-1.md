@@ -56,3 +56,4 @@
 順序更正交付2026-10-23 23:09 UTC+8：使用者明訂左隊｜左比分｜VS｜右比分｜右隊；四寬DOM/畫面順序、對齊、無溢出與展開通過；證據temp/score-order-verify.md，三審複審通過，正式站未更新。
 賽程一致性（完成，併發BUSY=6/CORES=10/MEMFREE=35%/BATCH=2，三審分批）：共用比分列覆蓋賽程順序/組合/對戰卡；查證原三處結構分離，使用者明訂隊-分-VS-分-隊，沿用Sports Editorial/單樹。任務共用實作→四寬/切換/展開/連結驗證→三審；風險資料欄位映射、live/0/未知/平手，新保留測試0，integration無套件。
 賽程驗收：首次37/37綠；按測試正典移除3條文案/class測試31行後34/34綠；四寬兩頁兩模式/工作人員/成績深連結/0與狀態通過；三審複審通過，證據temp/shared-matchup-verify.md。追加交付2026-10-23 23:22 UTC+8，正式站未更新。
+正式發布準備：GitHub Pages API核實main根目錄→正式網域，補docs/ops/deploy-config.yml；上線前完整unit34/34，integration/e2e無套件，prod-pending空；待本次prod逐字確認。
