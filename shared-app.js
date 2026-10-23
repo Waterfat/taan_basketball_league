@@ -406,34 +406,36 @@ function detectTeam(cell) {
    共用：對戰組合卡片
    ══════════════════════════════════════ */
 
+function buildMatchupSummary({ home, away, homeScore, awayScore, hasScores, finished }) {
+  const hc = TEAM_CONFIG[home] || {};
+  const ac = TEAM_CONFIG[away] || {};
+  const scored = Boolean(home && away && hasScores && homeScore != null && awayScore != null);
+  const homeWin = scored && finished && homeScore > awayScore;
+  const awayWin = scored && finished && awayScore > homeScore;
+  const pending = home && away ? '未開賽' : '尚未公告';
+  return `
+    <div class="matchup-summary bs-gc-matchup">
+      <span class="matchup-team matchup-home bs-gc-team bs-gc-home">
+        <span class="matchup-winner bs-gc-winner"${homeWin ? ` aria-label="${home}隊勝"` : ' aria-hidden="true"'}>${homeWin ? '👑' : ''}</span>
+        <span class="dot ${hc.dot || ''}" aria-hidden="true"></span>
+        <span class="matchup-team-name bs-gc-team-name ${hc.cls || ''}">${home || '待定'}</span>
+      </span>
+      <span class="matchup-score bs-gc-score ${hc.cls || ''}">${scored ? homeScore : '—'}</span>
+      <span class="matchup-vs bs-gc-vs">${scored ? 'VS' : pending}</span>
+      <span class="matchup-score bs-gc-score ${ac.cls || ''}">${scored ? awayScore : '—'}</span>
+      <span class="matchup-team matchup-away bs-gc-team bs-gc-away">
+        <span class="matchup-team-name bs-gc-team-name ${ac.cls || ''}">${away || '待定'}</span>
+        <span class="dot ${ac.dot || ''}" aria-hidden="true"></span>
+        <span class="matchup-winner bs-gc-winner"${awayWin ? ` aria-label="${away}隊勝"` : ' aria-hidden="true"'}>${awayWin ? '👑' : ''}</span>
+      </span>
+    </div>`;
+}
+
 function buildMatchupCard(m) {
-  const hc = TEAM_CONFIG[m.home] || {};
-  const ac = TEAM_CONFIG[m.away] || {};
-  const hasTeams = m.home && m.away;
-
-  let scoreHtml = '';
-  if (m.status === 'finished' && m.homeScore != null && m.awayScore != null) {
-    const winner = m.homeScore > m.awayScore ? m.home : m.away;
-    scoreHtml = `
-      <div class="hgc-score-row">
-        <span class="hgc-s ${hc.cls}">${m.homeScore}</span>
-        <span class="hgc-colon">:</span>
-        <span class="hgc-s ${ac.cls}">${m.awayScore}</span>
-      </div>
-      <span class="badge bw" style="font-size:.62rem">${winner}隊勝</span>`;
-  } else if (!hasTeams) {
-    scoreHtml = '<div class="hgc-pending" style="color:var(--txt-light)">尚未公告</div>';
-  }
-
   return `
     <div class="hgc${m.status === 'upcoming' ? ' hgc-upcoming' : ''}">
       <span class="hgc-num">組合 ${m.combo}</span>
-      <div class="hgc-matchup">
-        <span class="hgc-team ${hc.cls}">${hasTeams ? m.home + '隊' : '—'}</span>
-        <span class="hgc-vs">VS</span>
-        <span class="hgc-team ${ac.cls}">${hasTeams ? m.away + '隊' : '—'}</span>
-      </div>
-      ${scoreHtml}
+      ${buildMatchupSummary({ ...m, hasScores: m.status === 'finished' || m.status === 'live', finished: m.status === 'finished' })}
     </div>`;
 }
 

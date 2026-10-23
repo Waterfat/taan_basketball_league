@@ -11,42 +11,8 @@
   let _schedule = null;
   let _viewIndex = -1;
 
-  /* ═══════════════════════════════
-     Status helpers
-     ═══════════════════════════════ */
-  function gameScoreHtml(game) {
-    if (game.status === 'finished' || game.status === 'live') {
-      const hc = TEAM_CONFIG[game.home] || {};
-      const ac = TEAM_CONFIG[game.away] || {};
-      return `<span class="${hc.cls}">${game.homeScore}</span> <span style="color:var(--txt-light);font-size:.8rem">:</span> <span class="${ac.cls}">${game.awayScore}</span>`;
-    }
-    return '';
-  }
-
-  /* ═══════════════════════════════
-     Schedule page — game cards
-     ═══════════════════════════════ */
   function buildSchedGameCard(game, phase, weekNum) {
-    // 賽程順序尚未排定 → 簡化顯示
-    if (!game.home && !game.away) {
-      return `
-        <div class="game-card">
-          <div class="gc-head">
-            <div class="gc-stripe"></div>
-            <div class="gc-num">GAME ${game.num}</div>
-            <div class="gc-teams" style="justify-content:center;color:var(--txt-light);font-size:.85rem">尚未安排</div>
-          </div>
-        </div>`;
-    }
-
-    const hc = TEAM_CONFIG[game.home] || {};
-    const ac = TEAM_CONFIG[game.away] || {};
-
-    const isFinished = game.status === 'finished' || game.status === 'live';
-    const homeWin = isFinished && game.homeScore > game.awayScore;
-    const awayWin = isFinished && game.awayScore > game.homeScore;
-
-    const scoreMidHtml = isFinished ? gameScoreHtml(game) : '';
+    const hasScores = game.status === 'finished' || game.status === 'live';
 
     let staffHtml = '';
     if (game.staff && Object.keys(game.staff).length) {
@@ -63,23 +29,18 @@
       }).join('');
     }
 
-    const bsBtn = (isFinished && phase && weekNum && game.num)
-      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&relweek=${weekNum}&game=${game.num}" class="gc-bs-btn">📊</a>`
+    const bsBtn = (hasScores && phase && weekNum && game.num)
+      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&relweek=${weekNum}&game=${game.num}" class="gc-bs-btn" aria-label="查看第 ${game.num} 場成績">📊</a>`
       : '';
 
-    // 有比分(finished) → 全部收合；沒比分(upcoming) → 全部展開
     return `
-      <div class="game-card${!isFinished ? ' open' : ''}">
+      <div class="game-card${!hasScores ? ' open' : ''}">
         <div class="gc-head">
           <div class="gc-stripe"></div>
           <div class="gc-num">GAME ${game.num}${game.time ? ' · ' + game.time : ''}</div>
-          <div class="gc-teams">
-            <span class="${hc.cls} gc-tname-h">${homeWin ? '👑 ' : ''}${game.home}</span>
-            <div class="gc-score-mid">${scoreMidHtml}</div>
-            <span class="${ac.cls} gc-tname-a">${game.away}${awayWin ? ' 👑' : ''}</span>
-          </div>
           ${bsBtn}
           <div class="gc-arr">▼</div>
+          ${buildMatchupSummary({ ...game, hasScores, finished: game.status === 'finished' })}
         </div>
         <div class="gc-body">${staffHtml}</div>
       </div>`;

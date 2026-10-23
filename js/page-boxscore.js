@@ -133,13 +133,6 @@
      ════════════════════════════════ */
   function buildGameCard(game, idx) {
     const hc = TEAM_CONFIG[game.homeTeam] || {};
-    const ac = TEAM_CONFIG[game.awayTeam] || {};
-
-    const hasTeams = game.homeTeam && game.awayTeam;
-    const hasScores = hasTeams && game.hasScores;
-    const homeWin = hasScores && game.homeScore > game.awayScore;
-    const awayWin = hasScores && game.awayScore > game.homeScore;
-
     const gameNum = game.gameNum || (idx + 1);
     const bodyId = `bs-body-${idx}`;
 
@@ -151,21 +144,7 @@
             <span class="bs-gc-num">GAME ${gameNum}</span>
           </div>
           <div class="bs-gc-arr">▼</div>
-          <div class="bs-gc-matchup">
-            <span class="bs-gc-team bs-gc-home">
-              <span class="bs-gc-winner" aria-label="${homeWin ? '勝方' : ''}">${homeWin ? '👑' : ''}</span>
-              <span class="dot ${hc.dot || ''}"></span>
-              <span class="bs-gc-team-name ${hc.cls || ''}">${game.homeTeam || '待定'}</span>
-            </span>
-            <span class="bs-gc-score ${hc.cls || ''}">${hasScores ? game.homeScore : '—'}</span>
-            <span class="bs-gc-vs">${hasScores ? 'VS' : '未開賽'}</span>
-            <span class="bs-gc-score ${ac.cls || ''}">${hasScores ? game.awayScore : '—'}</span>
-            <span class="bs-gc-team bs-gc-away">
-              <span class="bs-gc-team-name ${ac.cls || ''}">${game.awayTeam || '待定'}</span>
-              <span class="dot ${ac.dot || ''}"></span>
-              <span class="bs-gc-winner" aria-label="${awayWin ? '勝方' : ''}">${awayWin ? '👑' : ''}</span>
-            </span>
-          </div>
+          ${buildMatchupSummary({ home: game.homeTeam, away: game.awayTeam, homeScore: game.homeScore, awayScore: game.awayScore, hasScores: game.hasScores, finished: game.status !== 'live' })}
         </div>
         <div class="bs-gc-body" id="${bodyId}"></div>
       </div>`;

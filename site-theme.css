@@ -162,26 +162,29 @@ a.nav-logo { display: flex; align-items: center; gap: var(--space3); margin: 0 a
 .state-msg { background: var(--surface); border: 1px solid var(--n200); border-radius: var(--radius); padding: var(--space12) var(--space6); font: 400 var(--fs-body)/1.6 var(--font-body); color: var(--n500); }
 .state-error { color: var(--red); }
 .spinner { border-color: var(--n200); border-top-color: var(--brand); }
-.gc-head { flex-wrap: wrap; padding: var(--space4); gap: var(--space2); }
-.gc-num { min-width: 0; flex-basis: 100%; padding-left: 0; font-size: var(--fs-xs); }
-.gc-teams { font-size: var(--fs-lg); }
+.gc-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; padding: var(--space4); gap: var(--space3); }
+.gc-num { min-width: 0; padding-left: 0; font-size: var(--fs-xs); }
 .gc-bs-btn { min-width: var(--touch); padding: var(--space2); }
+.gc-arr { grid-column: 3; }
 .gc-body { padding: var(--space4); }
 .game-card.open .gc-body { padding: var(--space4); grid-template-columns: minmax(0, 1fr); }
 .bs-gc-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-width: 0; padding: var(--space4); gap: var(--space3); }
 .bs-gc-stripe { position: absolute; inset: 0 auto 0 0; width: var(--space1); }
 .bs-gc-meta { min-width: 0; }
-.bs-gc-matchup { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) var(--space8) var(--fs-number) var(--space8) minmax(0, 1fr); gap: var(--space2); font-size: var(--fs-base); letter-spacing: 0; }
-.bs-gc-team { display: grid; align-items: center; gap: var(--space1); min-width: 0; }
-.bs-gc-home { grid-template-columns: var(--fs-base) var(--space2) minmax(0, 1fr); }
-.bs-gc-away { grid-template-columns: minmax(0, 1fr) var(--space2) var(--fs-base); }
-.bs-gc-team-name { text-align: center; overflow-wrap: anywhere; }
-.bs-gc-winner { font-size: var(--fs-sm); text-align: center; }
-.bs-gc-team .dot { width: var(--space2); height: var(--space2); margin: 0; }
-.bs-gc-vs { font-size: var(--fs-xs); text-align: center; }
+.matchup-summary { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) var(--space8) var(--fs-number) var(--space8) minmax(0, 1fr); align-items: center; gap: var(--space2); min-width: 0; width: 100%; font-family: var(--font-disp); font-size: var(--fs-base); letter-spacing: 0; }
+.matchup-team { display: grid; align-items: center; gap: var(--space1); min-width: 0; }
+.matchup-home { grid-template-columns: var(--fs-base) var(--space2) minmax(0, 1fr); }
+.matchup-away { grid-template-columns: minmax(0, 1fr) var(--space2) var(--fs-base); }
+.matchup-team-name { text-align: center; overflow-wrap: anywhere; font-weight: 700; }
+.matchup-winner { font-size: var(--fs-sm); text-align: center; }
+.matchup-team .dot { width: var(--space2); height: var(--space2); margin: 0; }
+.matchup-vs { font-size: var(--fs-xs); color: var(--txt-light); text-align: center; }
+.matchup-score { display: block; font-size: var(--fs-xl); font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; letter-spacing: 0; }
+.page-schedule .matchup-grid { grid-template-columns: minmax(0, 1fr); gap: var(--space3); }
+.page-schedule .hgc { align-items: stretch; gap: var(--space3); padding: var(--space4); background: var(--surface); }
+.page-schedule .hgc-num { text-align: left; font-size: var(--fs-xs); }
 .bs-team-block { min-width: 0; padding: var(--space4); }
 .bs-table { min-width: 640px; }
-.bs-gc-score { display: block; font-size: var(--fs-xl); font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; letter-spacing: 0; }
 .bs-paren, .bs-pct, .bsi-label, .bsi-ldr-cat, .bs-recorder { font-size: var(--fs-xs); }
 .bsi-ldr-row { grid-template-columns: minmax(0, .9fr) minmax(0, 1.2fr) auto; }
 .bsi-ldr-name { overflow-wrap: anywhere; }
@@ -190,10 +193,9 @@ a.nav-logo { display: flex; align-items: center; gap: var(--space3); margin: 0 a
   #sched-hero-content, #bs-hero-content { flex-wrap: nowrap; }
   .sched-hero-right { text-align: right; }
   .game-card.open .gc-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .gc-head { flex-wrap: nowrap; }
-  .gc-num { flex-basis: auto; min-width: 90px; }
 }
 @media (min-width: 960px) {
+  .page-schedule .matchup-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   body { padding-bottom: 0; }
   nav#top-nav { height: 80px; padding-inline: max(var(--space8), calc((100vw - 1216px) / 2)); gap: var(--space8); }
   #top-nav .nav-links { display: flex; align-self: stretch; gap: var(--space6); }
