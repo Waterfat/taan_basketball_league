@@ -55,9 +55,9 @@
           const team = detectTeam(p);
           if (team) {
             const tc = TEAM_CONFIG[team] || {};
-            return `<span class="${tc.cls || ''}">${p}</span>`;
+            return `<span class="player-name ${tc.cls || ''}">${p}</span>`;
           }
-          return p;
+          return `<span class="player-name">${p}</span>`;
         }).join('<span class="gc-name-sep">・</span>');
         return `<div class="gc-staff"><span class="gc-role">${role}</span><span class="gc-name">${coloredNames}</span></div>`;
       }).join('');

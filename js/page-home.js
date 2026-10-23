@@ -20,7 +20,7 @@
   }
 
   function renderDragon(data) {
-    const rows = (data.dragonTop10 || []).slice(0, 3).map(p => `<div class="player-row"><span class="player-rank">${esc(p.rank)}</span><span class="player-info">${esc(p.name)}<small>${esc(p.team)}隊 · 出席 ${esc(p.att)} / 輪值 ${esc(p.duty)}</small></span><span class="player-value">${esc(p.total)}<small>分</small></span></div>`).join('');
+    const rows = (data.dragonTop10 || []).slice(0, 3).map(p => `<div class="player-row"><span class="player-rank">${esc(p.rank)}</span><span class="player-info"><span class="player-name ${TEAM_CONFIG[p.team]?.cls || ''}">${esc(p.name)}</span><small>${esc(p.team)}隊 · 出席 ${esc(p.att)} / 輪值 ${esc(p.duty)}</small></span><span class="player-value">${esc(p.total)}<small>分</small></span></div>`).join('');
     document.getElementById('home-dragon').innerHTML = panelHead('BEYOND THE SCORE', '積分龍虎榜') + `<p class="dragon-desc">每一次出席、每一份付出，都算數。</p><div class="dragon-list">${rows || '<p class="home-message">尚無積分資料</p>'}</div><a class="panel-link" href="dragon.html">查看完整排名 <span>↗</span></a>`;
   }
 
@@ -32,8 +32,8 @@
     const panels = available.map((cat, i) => {
       const s = stats[cat];
       const [first, ...others] = s.players || [];
-      const featured = first ? `<div class="featured-player" style="${teamStyle(first.team)}"><div class="jersey">${jersey}</div><div><span class="player-kicker">${esc(first.team)}隊 · ${esc(s.label)}領先者</span><h3>${esc(first.name)}</h3><div class="featured-value">${Number(first.val).toFixed(2)}<small>${esc(s.unit)}</small></div></div></div>` : '';
-      const rows = others.map(p => `<div class="player-row"><span class="player-rank">${esc(p.rank)}</span><span class="player-info">${esc(p.name)}<small>${esc(p.team)}隊</small></span><span class="player-value">${Number(p.val).toFixed(2)}<small>${esc(s.unit)}</small></span></div>`).join('');
+      const featured = first ? `<div class="featured-player" style="${teamStyle(first.team)}"><div class="jersey">${jersey}</div><div><span class="player-kicker">${esc(first.team)}隊 · ${esc(s.label)}領先者</span><h3><span class="player-name ${TEAM_CONFIG[first.team]?.cls || ''}">${esc(first.name)}</span></h3><div class="featured-value">${Number(first.val).toFixed(2)}<small>${esc(s.unit)}</small></div></div></div>` : '';
+      const rows = others.map(p => `<div class="player-row"><span class="player-rank">${esc(p.rank)}</span><span class="player-info"><span class="player-name ${TEAM_CONFIG[p.team]?.cls || ''}">${esc(p.name)}</span><small>${esc(p.team)}隊</small></span><span class="player-value">${Number(p.val).toFixed(2)}<small>${esc(s.unit)}</small></span></div>`).join('');
       return `<div class="stat-content" id="ms-${cat}" role="tabpanel" aria-labelledby="tab-${cat}"${i ? ' hidden' : ''}>${featured || '<p class="home-message">本項尚無個人數據</p>'}<div class="player-list">${rows}</div></div>`;
     }).join('');
     container.innerHTML = panelHead('SEASON LEADERS', '場上的焦點', 'leaders.html', '全部數據') + `<div class="stat-tabs" role="tablist" aria-label="個人數據項目">${tabs}</div>${panels || '<p class="home-message">尚無個人數據</p>'}`;

@@ -40,7 +40,7 @@
      ════════════════════════════════ */
   function playerRowHtml(p, tc) {
     const dnpCls = p.played ? '' : ' bs-dnp';
-    const namePart = `<span class="${tc.cls || ''}">${p.name}</span>`;
+    const namePart = `<span class="player-name ${tc.cls || ''}">${p.name}</span>`;
     const dnpTag = !p.played ? '<span class="bs-dnp-tag">(未出賽)</span>' : '';
     return `
       <tr class="bs-pr${dnpCls}">
@@ -232,7 +232,7 @@
       return `
         <div class="bsi-ldr-row">
           <div class="bsi-ldr-cat">${icon} ${label}</div>
-          <div class="bsi-ldr-name"><span class="${tc.cls}"${style}>${player.name}</span></div>
+          <div class="bsi-ldr-name"><span class="player-name ${tc.cls}"${style}>${player.name}</span></div>
           <div class="bsi-ldr-val">${player[key]}<span class="bsi-ldr-unit"> ${unit}</span></div>
         </div>`;
     };
@@ -307,7 +307,7 @@
     bodyEl.dataset.rendered = '1';
 
     const recorderHtml = game.recorder
-      ? `<div class="bs-recorder">📝 記錄：${game.recorder}</div>`
+      ? `<div class="bs-recorder">📝 記錄：<span class="player-name ${TEAM_CONFIG[detectTeam(game.recorder)]?.cls || ''}">${game.recorder}</span></div>`
       : '';
 
     const insightsHtml = game.hasScores ? `

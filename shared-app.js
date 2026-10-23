@@ -237,7 +237,7 @@ function teamTdHtml(teamName) {
 function nameTdHtml(playerName, teamName) {
   const t = TEAM_CONFIG[teamName] || {};
   const style = t.nameStyle ? ` style="${t.nameStyle}"` : '';
-  return `<td><span class="${t.cls || ''}"${style}>${playerName}</span></td>`;
+  return `<td><span class="player-name ${t.cls || ''}"${style}>${playerName}</span></td>`;
 }
 
 function rowBgStyle(teamName) {
@@ -273,7 +273,7 @@ function renderPodium(containerId, top3, unit) {
     const ri = podOrder[i];
     return `<div class="pod-card ${MEDAL_CLS[ri]}">
       <span class="pod-medal">${MEDALS[ri]}</span>
-      <div class="pod-name"><span class="${t.cls || ''}"${nameStyle}>${p.name}</span></div>
+      <div class="pod-name"><span class="player-name ${t.cls || ''}"${nameStyle}>${p.name}</span></div>
       <div class="pod-val ${vCls[ri]}">${p.val.toFixed(2)}</div>
       <div class="pod-unit">${unit}</div>
     </div>`;

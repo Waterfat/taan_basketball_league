@@ -20,7 +20,7 @@
       const isFirst = i === 0;
       return `<tr>
         <td><span class="srank${isFirst ? ' gold' : ''}">${i + 1}</span></td>
-        <td>${isFirst ? '<strong>' : ''}${p.name}${isFirst ? '</strong>' : ''}</td>
+        ${nameTdHtml(p.name, p.team)}
         <td><span class="sval">${p.ppg}</span></td>
         <td>${p.rpg}</td><td>${p.apg}</td><td>${p.bpg}</td><td>${p.spg}</td><td>${p.eff}</td>
       </tr>`;
@@ -43,7 +43,7 @@
       const isFirst = i === 0;
       return `<tr>
         <td><span class="srank${isFirst ? ' gold' : ''}">${i + 1}</span></td>
-        <td>${isFirst ? '<strong>' : ''}${p.name}${isFirst ? '</strong>' : ''}</td>
+        ${nameTdHtml(p.name, p.team)}
         <td><span class="sval">${p.pts}</span></td>
         <td>${p.reb}</td><td>${p.ast}</td><td>${p.games}</td>
       </tr>`;
@@ -63,7 +63,7 @@
       const isFirst = i === 0;
       return `<tr>
         <td><span class="srank${isFirst ? ' gold' : ''}">${i + 1}</span></td>
-        <td>${isFirst ? '<strong>' : ''}${p.name}${isFirst ? '</strong>' : ''}</td>
+        ${nameTdHtml(p.name, p.team)}
         <td><span class="sval">${p.total}</span></td>
         <td>${p.p2}</td><td>${p.p3}</td><td>${p.ft}</td>
       </tr>`;

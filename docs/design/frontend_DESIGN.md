@@ -7,7 +7,7 @@
 CSS variables 定義 orange 500/600/700（主動作）、green 500/700（勝績）、neutral 50–900。隊伍色保留紅黑藍綠黃白語意；所有元件透過 token 取值。主色 #ed571b，文字 #202622，背景 #f4f5f2，白卡 #fff，細線 #e4e6e1。
 
 ## 3. Typography Rules
-Noto Sans TC：正文 14/16，標題 20/24，400/500/700。Barlow Condensed：英文標籤、比分、主標 36–64，700。標題行高 1.1–1.25，正文 1.6，小字 1.5；大字收緊，小字不收。數字使用 tabular-nums。
+Noto Sans TC：正文 14/16；人名至少18px，保留原本較大字級，黑隊700、其他隊500；標題 20/24，400/500/700。Barlow Condensed：英文標籤、比分、主標 36–64，700。標題行高 1.1–1.25，正文 1.6，小字 1.5；大字收緊，小字不收。數字使用 tabular-nums。
 
 ## 4. Component Stylings
 卡片白底，細描邊，圓角 12；賽程白底隊徽、開賽狀態。按鈕 44px 以上，主動作橘色，hover 深一階，active 深兩階，focus-visible 3px outline，disabled 淺灰。頁籤 aria-selected；正式互動含比賽週切換、數據項目切換、手機選單；已完賽場次連入既有單場對戰數據頁。圖示採一致線條 SVG。無對應頁面功能以站內既有官方頁連結提供。

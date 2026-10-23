@@ -204,3 +204,6 @@ a.nav-logo { display: flex; align-items: center; gap: var(--space3); margin: 0 a
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+.player-name { font-size: max(1em, 18px); font-weight: 500; }
+.player-name.c-black { font-weight: 700; }
