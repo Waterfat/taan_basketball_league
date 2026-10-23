@@ -6,7 +6,7 @@
 - [x] Step 3：實作。
 - [x] Step 4：37/37 unit；12頁×4寬48組無溢出，真實操作與離線資源通過。
 - [x] Step 5：conventions/architecture/tests 三道通過；切週finding修復後三道複審綠。
-- [ ] Step 6（進行中）：commit/push/草稿PR；正式站main自動發布，合併前待上線確認。
+- [x] Step 6 本地交付：commit/push/草稿PR已完成；正式站main自動發布，合併前待上線確認。
 - [ ] Step 7：待正式上線確認後執行。
 - [ ] Step 8：正式站尚未發布，Issue保留開啟。
 ## Task
@@ -33,3 +33,6 @@
 複審併發閘：BUSY=1，CORES=10，MEMFREE=43%，BATCH=6（slot限制3）；三道均唯讀。
 ## A1 待裁定（本輪）
 無。
+
+本輪交付時間：2026-10-23 22:26 UTC+8（開發驗收完成，非正式上線結案）。
+摘要：12頁換皮、真資料接線、48尺寸檢查、37單元測試、三道審查通過；待使用者確認上線，保留worktree與Issue。
