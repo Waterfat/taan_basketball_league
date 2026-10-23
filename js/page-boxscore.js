@@ -40,7 +40,7 @@
      ════════════════════════════════ */
   function playerRowHtml(p, tc) {
     const dnpCls = p.played ? '' : ' bs-dnp';
-    const namePart = `<span class="${tc.cls || ''}">${p.name}</span>`;
+    const namePart = `<span class="player-name ${tc.cls || ''}">${p.name}</span>`;
     const dnpTag = !p.played ? '<span class="bs-dnp-tag">(未出賽)</span>' : '';
     return `
       <tr class="bs-pr${dnpCls}">
@@ -133,20 +133,6 @@
      ════════════════════════════════ */
   function buildGameCard(game, idx) {
     const hc = TEAM_CONFIG[game.homeTeam] || {};
-    const ac = TEAM_CONFIG[game.awayTeam] || {};
-
-    const hasTeams = game.homeTeam && game.awayTeam;
-    const homeWin = game.hasScores && game.homeScore > game.awayScore;
-    const awayWin = game.hasScores && game.awayScore > game.homeScore;
-
-    const scoreHtml = game.hasScores
-      ? `<span class="bs-gc-s ${hc.cls}">${game.homeScore}</span><span class="bs-gc-colon">:</span><span class="bs-gc-s ${ac.cls}">${game.awayScore}</span>`
-      : `<span class="bs-gc-tbd">尚未開打</span>`;
-
-    const teamHtml = hasTeams
-      ? `${homeWin ? '<span class="gc-win">👑</span>' : ''}<span class="dot ${hc.dot}"></span><span class="${hc.cls}">${game.homeTeam}</span><span class="bs-gc-vs">VS</span>${awayWin ? '<span class="gc-win">👑</span>' : ''}<span class="dot ${ac.dot}"></span><span class="${ac.cls}">${game.awayTeam}</span>`
-      : ``;
-
     const gameNum = game.gameNum || (idx + 1);
     const bodyId = `bs-body-${idx}`;
 
@@ -157,9 +143,8 @@
           <div class="bs-gc-meta">
             <span class="bs-gc-num">GAME ${gameNum}</span>
           </div>
-          <div class="bs-gc-matchup">${teamHtml}</div>
-          <div class="bs-gc-score">${scoreHtml}</div>
           <div class="bs-gc-arr">▼</div>
+          ${buildMatchupSummary({ home: game.homeTeam, away: game.awayTeam, homeScore: game.homeScore, awayScore: game.awayScore, hasScores: game.hasScores, finished: game.status !== 'live' })}
         </div>
         <div class="bs-gc-body" id="${bodyId}"></div>
       </div>`;
@@ -232,7 +217,7 @@
       return `
         <div class="bsi-ldr-row">
           <div class="bsi-ldr-cat">${icon} ${label}</div>
-          <div class="bsi-ldr-name"><span class="${tc.cls}"${style}>${player.name}</span></div>
+          <div class="bsi-ldr-name"><span class="player-name ${tc.cls}"${style}>${player.name}</span></div>
           <div class="bsi-ldr-val">${player[key]}<span class="bsi-ldr-unit"> ${unit}</span></div>
         </div>`;
     };
@@ -307,7 +292,7 @@
     bodyEl.dataset.rendered = '1';
 
     const recorderHtml = game.recorder
-      ? `<div class="bs-recorder">📝 記錄：${game.recorder}</div>`
+      ? `<div class="bs-recorder">📝 記錄：<span class="player-name ${TEAM_CONFIG[detectTeam(game.recorder)]?.cls || ''}">${game.recorder}</span></div>`
       : '';
 
     const insightsHtml = game.hasScores ? `

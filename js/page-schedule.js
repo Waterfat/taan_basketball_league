@@ -11,42 +11,8 @@
   let _schedule = null;
   let _viewIndex = -1;
 
-  /* ═══════════════════════════════
-     Status helpers
-     ═══════════════════════════════ */
-  function gameScoreHtml(game) {
-    if (game.status === 'finished' || game.status === 'live') {
-      const hc = TEAM_CONFIG[game.home] || {};
-      const ac = TEAM_CONFIG[game.away] || {};
-      return `<span class="${hc.cls}">${game.homeScore}</span> <span style="color:var(--txt-light);font-size:.8rem">:</span> <span class="${ac.cls}">${game.awayScore}</span>`;
-    }
-    return '';
-  }
-
-  /* ═══════════════════════════════
-     Schedule page — game cards
-     ═══════════════════════════════ */
   function buildSchedGameCard(game, phase, weekNum) {
-    // 賽程順序尚未排定 → 簡化顯示
-    if (!game.home && !game.away) {
-      return `
-        <div class="game-card">
-          <div class="gc-head">
-            <div class="gc-stripe"></div>
-            <div class="gc-num">GAME ${game.num}</div>
-            <div class="gc-teams" style="justify-content:center;color:var(--txt-light);font-size:.85rem">尚未安排</div>
-          </div>
-        </div>`;
-    }
-
-    const hc = TEAM_CONFIG[game.home] || {};
-    const ac = TEAM_CONFIG[game.away] || {};
-
-    const isFinished = game.status === 'finished' || game.status === 'live';
-    const homeWin = isFinished && game.homeScore > game.awayScore;
-    const awayWin = isFinished && game.awayScore > game.homeScore;
-
-    const scoreMidHtml = isFinished ? gameScoreHtml(game) : '';
+    const hasScores = game.status === 'finished' || game.status === 'live';
 
     let staffHtml = '';
     if (game.staff && Object.keys(game.staff).length) {
@@ -55,31 +21,26 @@
           const team = detectTeam(p);
           if (team) {
             const tc = TEAM_CONFIG[team] || {};
-            return `<span class="${tc.cls || ''}">${p}</span>`;
+            return `<span class="player-name ${tc.cls || ''}">${p}</span>`;
           }
-          return p;
+          return `<span class="player-name">${p}</span>`;
         }).join('<span class="gc-name-sep">・</span>');
         return `<div class="gc-staff"><span class="gc-role">${role}</span><span class="gc-name">${coloredNames}</span></div>`;
       }).join('');
     }
 
-    const bsBtn = (isFinished && phase && weekNum && game.num)
-      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&relweek=${weekNum}&game=${game.num}" class="gc-bs-btn">📊</a>`
+    const bsBtn = (hasScores && phase && weekNum && game.num)
+      ? `<a href="boxscore.html?phase=${encodeURIComponent(phase)}&relweek=${weekNum}&game=${game.num}" class="gc-bs-btn" aria-label="查看第 ${game.num} 場成績">📊</a>`
       : '';
 
-    // 有比分(finished) → 全部收合；沒比分(upcoming) → 全部展開
     return `
-      <div class="game-card${!isFinished ? ' open' : ''}">
+      <div class="game-card${!hasScores ? ' open' : ''}">
         <div class="gc-head">
           <div class="gc-stripe"></div>
           <div class="gc-num">GAME ${game.num}${game.time ? ' · ' + game.time : ''}</div>
-          <div class="gc-teams">
-            <span class="${hc.cls} gc-tname-h">${homeWin ? '👑 ' : ''}${game.home}</span>
-            <div class="gc-score-mid">${scoreMidHtml}</div>
-            <span class="${ac.cls} gc-tname-a">${game.away}${awayWin ? ' 👑' : ''}</span>
-          </div>
           ${bsBtn}
           <div class="gc-arr">▼</div>
+          ${buildMatchupSummary({ ...game, hasScores, finished: game.status === 'finished' })}
         </div>
         <div class="gc-body">${staffHtml}</div>
       </div>`;
@@ -114,51 +75,6 @@
   /* ═══════════════════════════════
      Week navigation
      ═══════════════════════════════ */
-  function parseGameDate(dateStr) {
-    if (!dateStr) return null;
-    // Handle formats like "2026/2/7", "2026/2/14（六）07:30", "2026 / 2 / 14（六）07:30"
-    const clean = dateStr.replace(/\s/g, '').replace(/（.*$/, '');
-    const parts = clean.split('/');
-    if (parts.length >= 3) {
-      return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-    }
-    return null;
-  }
-
-  function findCurrentIndex(allWeeks, currentWeek) {
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    // Find the latest finished game week whose date has passed (after 23:59:59)
-    // Then default to the NEXT game week after it
-    let latestPassedIdx = -1;
-    for (let i = 0; i < allWeeks.length; i++) {
-      const entry = allWeeks[i];
-      if (!entry.date) continue;
-      const gameDate = parseGameDate(entry.date);
-      if (!gameDate) continue;
-      // If today > game date (i.e. game day has fully passed)
-      if (todayStart > gameDate) {
-        latestPassedIdx = i;
-      }
-    }
-
-    if (latestPassedIdx >= 0) {
-      // Find the next game week (skip suspended weeks)
-      for (let i = latestPassedIdx + 1; i < allWeeks.length; i++) {
-        if (allWeeks[i].type === 'game') return i;
-      }
-      // No future game week found — stay on the latest passed
-      return latestPassedIdx;
-    }
-
-    // Fallback: find by currentWeek
-    for (let i = 0; i < allWeeks.length; i++) {
-      if (allWeeks[i].type === 'game' && allWeeks[i].week === currentWeek) return i;
-    }
-    return 0;
-  }
-
   function updateHero(entry) {
     const heroContent = document.getElementById('sched-hero-content');
     if (!heroContent) return;
@@ -267,12 +183,12 @@
 
       // Schedule page: initialize navigation
       if (document.getElementById('btn-prev-week')) {
-        _viewIndex = findCurrentIndex(data.allWeeks, currentWeek);
+        _viewIndex = getScheduleWeekIndex(data.allWeeks, currentWeek);
         renderWeekView();
       }
 
       // Home page: emit schedule data for cross-module rendering
-      const homeIdx = findCurrentIndex(data.allWeeks, currentWeek);
+      const homeIdx = getScheduleWeekIndex(data.allWeeks, currentWeek);
       const homeEntry = data.allWeeks[homeIdx];
       if (homeEntry && homeEntry.type === 'game') {
         AppEvents.emit('scheduleReady', homeEntry, data.allWeeks);

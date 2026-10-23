@@ -16,10 +16,10 @@
 
   /* 名字 span（套隊伍色） */
   function nameSpan(name, team) {
-    if (!team || !TEAM_CONFIG[team]) return name;
+    if (!team || !TEAM_CONFIG[team]) return `<span class="player-name">${name}</span>`;
     const tc = TEAM_CONFIG[team];
     const style = tc.nameStyle ? ` style="${tc.nameStyle}"` : '';
-    return `<span class="${tc.cls}"${style}>${name}</span>`;
+    return `<span class="player-name ${tc.cls}"${style}>${name}</span>`;
   }
 
   /* 找出每欄最佳值的 row index */

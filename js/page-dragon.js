@@ -20,7 +20,7 @@
 
     return `<tr style="background:${bg}">
       <td><span class="${rankCls}">${p.rank}</span></td>
-      <td><span class="${tc.cls}">${p.name}</span>${tagHtml}</td>
+      <td><span class="player-name ${tc.cls}">${p.name}</span>${tagHtml}</td>
       <td><span class="${tc.cls}">${p.team}</span></td>
       <td>${p.att}</td><td>${p.duty}</td><td>${p.mop}</td>
       <td>${p.playoff !== null ? p.playoff : '—'}</td>

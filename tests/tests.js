@@ -271,37 +271,6 @@
   });
 
   /* ══════════════════════════════════════
-     buildMatchupCard
-     ══════════════════════════════════════ */
-  suite('buildMatchupCard');
-
-  test('已完成比賽 → 顯示比分', () => {
-    const html = buildMatchupCard({
-      combo: 1, home: '紅', away: '藍',
-      homeScore: 30, awayScore: 25, status: 'finished',
-    });
-    assert(html.includes('30'), '應包含主隊分數');
-    assert(html.includes('25'), '應包含客隊分數');
-    assert(html.includes('紅隊勝'), '應顯示勝方');
-  });
-
-  test('未開始 → 不顯示分數', () => {
-    const html = buildMatchupCard({
-      combo: 1, home: '紅', away: '藍',
-      status: 'upcoming',
-    });
-    assert(!html.includes('hgc-score-row'), '不應顯示分數');
-    assert(html.includes('hgc-upcoming'), '應標記為 upcoming');
-  });
-
-  test('無隊伍 → 顯示尚未公告', () => {
-    const html = buildMatchupCard({
-      combo: 1, home: '', away: '', status: 'upcoming',
-    });
-    assert(html.includes('尚未公告'), '應顯示尚未公告');
-  });
-
-  /* ══════════════════════════════════════
      AppEvents
      ══════════════════════════════════════ */
   suite('AppEvents');

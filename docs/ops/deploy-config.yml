@@ -1,0 +1,27 @@
+environments:
+  uat:
+    branch: feat/1-site-reskin
+    domain: http://127.0.0.1:8768
+    platform: local-static-preview
+    auto_deploy: false
+  prod:
+    branch: main
+    domain: https://waterfat.github.io/taan_basketball_league/
+    platform: github-pages
+    repository: Waterfat/taan_basketball_league
+    source_path: /
+    auto_deploy: true
+pre_deploy_verification:
+  unit: tests/test.html
+  integration: none
+  retained_e2e: none
+post_deploy_verification:
+  read_only: true
+  steps:
+    - Verify GitHub Pages build status and deployed commit against main.
+    - Check all twelve pages and their local CSS, JS, image and manifest assets.
+    - Compare published shared-app.js, site-theme.css and sw.js with the release.
+    - Open home, schedule and boxscore on mobile and desktop; follow a game result link.
+monitoring:
+  notification:
+    via: conversation

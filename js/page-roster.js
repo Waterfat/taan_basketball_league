@@ -48,7 +48,7 @@
     let tbody = '<tbody>';
     team.players.forEach(player => {
       const { present, done, pct } = countAtt(player.att);
-      tbody += `<tr class="${cfg.rowClass || ''}"><td><span class="pl-name" style="color:${cfg.textColor || ''}">${player.name}</span></td>`;
+      tbody += `<tr class="${cfg.rowClass || ''}"><td><span class="pl-name player-name ${cfg.cls || ''}" style="color:${cfg.textColor || ''}">${player.name}</span></td>`;
       player.att.forEach((v, i) => {
         const sepStyle = i > 0 ? ' style="border-left:1px solid var(--warm1)"' : '';
         tbody += `<td${sepStyle}>${attCell(v)}</td>`;
