@@ -45,3 +45,12 @@
 追加驗收：37/37 unit；受影響頁375/390/768/1440人名至少18px、黑700白500、無整頁溢出；三道APPROVE；證據temp/name-verify.md及name-review-*.md。
 歷史隊伍裁定：hof為11–19/24屆，未提供隊伍的人名保持中性500，不依當前roster推定過去隊伍。
 追加本地交付時間：2026-10-23 22:41 UTC+8；正式站仍待上線。
+
+## 切頁錯誤追加
+- [x] SW修復／獨立驗證／三道複審／更新PR：音效Range回應206被cache.put拒絕；不影響網路回應與靜態離線快取。
+根因證據：console-repro.cjs真瀏覽器workerErrors=TypeError: Partial response (status code 206) is unsupported；sw.js:70–72以response.ok涵蓋206且寫入未catch。
+同款：rg cache.put/respondWith/Range全站僅sw.js一個寫入點；影響所有載入音效的前台頁。unit既有37項，integration無套件；實際分段請求/換頁/離線回退為本輪驗收，不新增保留測試。
+本輪併發閘：BUSY=2、CORES=10、MEMFREE=35%、BATCH=6；受slot限制三道唯讀審查分批。
+追加結果：unit37/37、桌手機16次導航、Range206成功且未快取、寫入失敗仍200、離線CSS200/miss明確失敗、pageerrors與workerErrors均空；三道APPROVE。
+限制：離頁取消Sheets請求仍有黃色warning，對應ERR_ABORTED；未隱藏日誌。證據temp/console-verify-log.json。
+本次修復交付：2026-10-23 22:54 UTC+8；預覽驗收完成，正式站仍待上線。
