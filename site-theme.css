@@ -171,7 +171,7 @@ a.nav-logo { display: flex; align-items: center; gap: var(--space3); margin: 0 a
 .bs-gc-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-width: 0; padding: var(--space4); gap: var(--space3); }
 .bs-gc-stripe { position: absolute; inset: 0 auto 0 0; width: var(--space1); }
 .bs-gc-meta { min-width: 0; }
-.bs-gc-matchup { grid-column: 1 / -1; display: grid; grid-template-columns: var(--space8) minmax(0, 1fr) var(--fs-number) minmax(0, 1fr) var(--space8); gap: var(--space2); font-size: var(--fs-base); letter-spacing: 0; }
+.bs-gc-matchup { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) var(--space8) var(--fs-number) var(--space8) minmax(0, 1fr); gap: var(--space2); font-size: var(--fs-base); letter-spacing: 0; }
 .bs-gc-team { display: grid; align-items: center; gap: var(--space1); min-width: 0; }
 .bs-gc-home { grid-template-columns: var(--fs-base) var(--space2) minmax(0, 1fr); }
 .bs-gc-away { grid-template-columns: minmax(0, 1fr) var(--space2) var(--fs-base); }
