@@ -168,12 +168,20 @@ a.nav-logo { display: flex; align-items: center; gap: var(--space3); margin: 0 a
 .gc-bs-btn { min-width: var(--touch); padding: var(--space2); }
 .gc-body { padding: var(--space4); }
 .game-card.open .gc-body { padding: var(--space4); grid-template-columns: minmax(0, 1fr); }
-.bs-gc-head { min-width: 0; padding: var(--space4); gap: var(--space3); flex-wrap: wrap; }
-.bs-gc-meta { flex: 1; min-width: 0; }
+.bs-gc-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-width: 0; padding: var(--space4); gap: var(--space3); }
+.bs-gc-stripe { position: absolute; inset: 0 auto 0 0; width: var(--space1); }
+.bs-gc-meta { min-width: 0; }
+.bs-gc-matchup { grid-column: 1 / -1; display: grid; grid-template-columns: var(--space8) minmax(0, 1fr) var(--fs-number) minmax(0, 1fr) var(--space8); gap: var(--space2); font-size: var(--fs-base); letter-spacing: 0; }
+.bs-gc-team { display: grid; align-items: center; gap: var(--space1); min-width: 0; }
+.bs-gc-home { grid-template-columns: var(--fs-base) var(--space2) minmax(0, 1fr); }
+.bs-gc-away { grid-template-columns: minmax(0, 1fr) var(--space2) var(--fs-base); }
+.bs-gc-team-name { text-align: center; overflow-wrap: anywhere; }
+.bs-gc-winner { font-size: var(--fs-sm); text-align: center; }
+.bs-gc-team .dot { width: var(--space2); height: var(--space2); margin: 0; }
+.bs-gc-vs { font-size: var(--fs-xs); text-align: center; }
 .bs-team-block { min-width: 0; padding: var(--space4); }
 .bs-table { min-width: 640px; }
-.bs-gc-score { font-size: var(--fs-xl); }
-.bs-gc-matchup { font-size: var(--fs-base); }
+.bs-gc-score { display: block; font-size: var(--fs-xl); font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; letter-spacing: 0; }
 .bs-paren, .bs-pct, .bsi-label, .bsi-ldr-cat, .bs-recorder { font-size: var(--fs-xs); }
 .bsi-ldr-row { grid-template-columns: minmax(0, .9fr) minmax(0, 1.2fr) auto; }
 .bsi-ldr-name { overflow-wrap: anywhere; }

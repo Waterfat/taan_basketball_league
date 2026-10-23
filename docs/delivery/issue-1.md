@@ -54,3 +54,6 @@
 追加結果：unit37/37、桌手機16次導航、Range206成功且未快取、寫入失敗仍200、離線CSS200/miss明確失敗、pageerrors與workerErrors均空；三道APPROVE。
 限制：離頁取消Sheets請求仍有黃色warning，對應ERR_ABORTED；未隱藏日誌。證據temp/console-verify-log.json。
 本次修復交付：2026-10-23 22:54 UTC+8；預覽驗收完成，正式站仍待上線。
+
+對戰卡片追加（完成，併發BUSY=6/CORES=10/MEMFREE=47%/BATCH=2，三審分兩批）：左右比分/隊伍鏡像對齊，沿用既定Sports Editorial與單樹；查證原bs-gc-matchup與score分離且flex-wrap造成右側擁擠。實作→四寬及0/待賽驗證→三道審→更新PR，風險為展開/深連結；無新增保留測試/integration套件。
+對戰驗收：37/37；四寬375/390/768/1440對齊/無溢出，真0/未賽/雙隊未定、展開收合/週切換/深連結皆過；平手無真資料、嚴格>程式審。證據temp/score-layout-verify.md；三審通過。追加交付2026-10-23 23:04 UTC+8，未正式上線。
