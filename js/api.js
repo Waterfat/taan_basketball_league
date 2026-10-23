@@ -895,8 +895,10 @@ function parseGameBlock(block) {
   if (!weekNum) return null;
 
   const recorder  = bsStr(m2[14]);
-  const homeScore = parseInt(m2[18]) || null;
-  const awayScore = parseInt(m2[21]) || null;
+  const homeValue = parseInt(m2[18]);
+  const awayValue = parseInt(m2[21]);
+  const homeScore = Number.isFinite(homeValue) ? homeValue : null;
+  const awayScore = Number.isFinite(awayValue) ? awayValue : null;
   const hasScores = homeScore !== null && awayScore !== null;
 
   // 合計列

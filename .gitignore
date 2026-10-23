@@ -10,3 +10,9 @@ Thumbs.db
 
 # Node (if added later)
 node_modules/
+
+# New UI prototype (not for commit)
+_new-ui/
+
+.Codex-output/
+.playwright-mcp/

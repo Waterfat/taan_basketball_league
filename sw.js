@@ -3,7 +3,7 @@
    策略：network-first（優先連網取最新資料，離線才用快取）
    ══════════════════════════════════════ */
 
-const CACHE_NAME = 'taan-basketball-v2';
+const CACHE_NAME = 'taan-basketball-reskin-20261023';
 
 const STATIC_ASSETS = [
   './index.html',
@@ -19,6 +19,9 @@ const STATIC_ASSETS = [
   './hof.html',
   './announce.html',
   './shared-styles.css',
+  './site-theme.css',
+  './home.css',
+  './assets/court.jpg',
   './shared-app.js',
   './js/api.js',
   './js/mock-data.js',
@@ -48,7 +51,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+      Promise.all(keys.filter(k => k.startsWith('taan-basketball-') && k !== CACHE_NAME).map(k => caches.delete(k)))
     )
   );
   self.clients.claim();
@@ -71,8 +74,9 @@ self.addEventListener('fetch', event => {
         return response;
       })
       .catch(() => {
-        // 離線：從快取取
-        return caches.match(event.request);
+        const url = new URL(event.request.url);
+        const isStatic = STATIC_ASSETS.some(asset => new URL(asset, self.location.href).href === url.origin + url.pathname);
+        return caches.open(CACHE_NAME).then(cache => cache.match(event.request, { ignoreSearch: isStatic }));
       })
   );
 });

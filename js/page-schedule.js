@@ -114,51 +114,6 @@
   /* ═══════════════════════════════
      Week navigation
      ═══════════════════════════════ */
-  function parseGameDate(dateStr) {
-    if (!dateStr) return null;
-    // Handle formats like "2026/2/7", "2026/2/14（六）07:30", "2026 / 2 / 14（六）07:30"
-    const clean = dateStr.replace(/\s/g, '').replace(/（.*$/, '');
-    const parts = clean.split('/');
-    if (parts.length >= 3) {
-      return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-    }
-    return null;
-  }
-
-  function findCurrentIndex(allWeeks, currentWeek) {
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    // Find the latest finished game week whose date has passed (after 23:59:59)
-    // Then default to the NEXT game week after it
-    let latestPassedIdx = -1;
-    for (let i = 0; i < allWeeks.length; i++) {
-      const entry = allWeeks[i];
-      if (!entry.date) continue;
-      const gameDate = parseGameDate(entry.date);
-      if (!gameDate) continue;
-      // If today > game date (i.e. game day has fully passed)
-      if (todayStart > gameDate) {
-        latestPassedIdx = i;
-      }
-    }
-
-    if (latestPassedIdx >= 0) {
-      // Find the next game week (skip suspended weeks)
-      for (let i = latestPassedIdx + 1; i < allWeeks.length; i++) {
-        if (allWeeks[i].type === 'game') return i;
-      }
-      // No future game week found — stay on the latest passed
-      return latestPassedIdx;
-    }
-
-    // Fallback: find by currentWeek
-    for (let i = 0; i < allWeeks.length; i++) {
-      if (allWeeks[i].type === 'game' && allWeeks[i].week === currentWeek) return i;
-    }
-    return 0;
-  }
-
   function updateHero(entry) {
     const heroContent = document.getElementById('sched-hero-content');
     if (!heroContent) return;
@@ -267,12 +222,12 @@
 
       // Schedule page: initialize navigation
       if (document.getElementById('btn-prev-week')) {
-        _viewIndex = findCurrentIndex(data.allWeeks, currentWeek);
+        _viewIndex = getScheduleWeekIndex(data.allWeeks, currentWeek);
         renderWeekView();
       }
 
       // Home page: emit schedule data for cross-module rendering
-      const homeIdx = findCurrentIndex(data.allWeeks, currentWeek);
+      const homeIdx = getScheduleWeekIndex(data.allWeeks, currentWeek);
       const homeEntry = data.allWeeks[homeIdx];
       if (homeEntry && homeEntry.type === 'game') {
         AppEvents.emit('scheduleReady', homeEntry, data.allWeeks);

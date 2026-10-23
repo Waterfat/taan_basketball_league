@@ -21,63 +21,69 @@ Object.values(TEAM_CONFIG).forEach(t => { TEAM_BY_ID[t.id] = t; });
 
 /* ── Navigation config ── */
 const NAV_ITEMS = [
-  { id: 'home',     label: '首頁',       icon: '🏠', file: 'index.html' },
-  { id: 'schedule', label: '賽程',       icon: '📅', file: 'schedule.html' },
-  { id: 'standings',label: '戰績榜',     icon: '🏆', file: 'standings.html' },
-  { id: 'boxscore', label: '數據',       icon: '📊', file: 'boxscore.html' },
-  { id: 'leaders',  label: '領先榜',     icon: '🏅', file: 'leaders.html' },
-  { id: 'roster',   label: '球員名單',   icon: '👥', file: 'roster.html' },
-  { id: 'dragon',   label: '龍虎榜',     icon: '🐉', file: 'dragon.html' },
-  // 以下功能暫不開放，待後續版本製作
-  // { id: 'stats',    label: '數據',       icon: '📊', file: 'stats.html' },
-  // { id: 'rotation', label: '輪值',       icon: '📋', file: 'rotation.html' },
-  // { id: 'history',  label: '歷史',       icon: '📜', file: 'history.html' },
-  // { id: 'hof',      label: '名人堂',     icon: '🏛', file: 'hof.html' },
-  // { id: 'announce', label: '公告',       icon: '📢', file: 'announce.html' },
+  { id: 'home', label: '首頁', file: 'index.html', icon: 'home' },
+  { id: 'schedule', label: '賽程', file: 'schedule.html', icon: 'calendar' },
+  { id: 'standings', label: '戰績', file: 'standings.html', icon: 'trophy' },
+  { id: 'leaders', label: '領先榜', file: 'leaders.html', icon: 'chart' },
+  { id: 'stats', label: '個人數據', file: 'stats.html', icon: 'chart' },
+  { id: 'roster', label: '球員名單', file: 'roster.html', icon: 'users' },
+  { id: 'dragon', label: '積分龍虎榜', file: 'dragon.html', icon: 'trophy' },
+  { id: 'rotation', label: '輪值', file: 'rotation.html', icon: 'calendar' },
+  { id: 'history', label: '歷史賽季', file: 'history.html', icon: 'calendar' },
+  { id: 'hof', label: '名人堂', file: 'hof.html', icon: 'trophy' },
+  { id: 'announce', label: '聯盟公告', file: 'announce.html', icon: 'notice' },
+  { id: 'boxscore', label: '對戰數據', file: 'boxscore.html', icon: 'chart' },
 ];
 
-/* ── Detect current page ── */
 function getCurrentPageId() {
-  const path = window.location.pathname;
-  const filename = path.split('/').pop() || 'index.html';
-  const item = NAV_ITEMS.find(n => n.file === filename);
-  return item ? item.id : 'home';
+  const filename = window.location.pathname.split('/').pop() || 'index.html';
+  return NAV_ITEMS.find(item => item.file === filename)?.id || 'home';
 }
 
-/* ── Build and inject navigation ── */
+function navIcon(name) {
+  const paths = {
+    home: '<path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 20v-7h6v7"/>',
+    calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18"/>',
+    trophy: '<path d="M8 3h8v6a4 4 0 0 1-8 0ZM8 5H4v3a4 4 0 0 0 4 4m8-7h4v3a4 4 0 0 1-4 4m-4 1v6m-4 2h8"/>',
+    chart: '<path d="M4 3v17h17M8 16v-5m5 5V6m5 10V9"/>',
+    users: '<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3m1-16a3 3 0 0 1 0 6m3 10v-3a6 6 0 0 0-2-4"/>',
+    notice: '<path d="m4 9 15-5v15L4 14Zm0 0H2v5h2m3 1 2 6h4l-2-5"/>',
+    menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  };
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name] || paths.chart}</svg>`;
+}
+
 function initNavigation() {
   const currentId = getCurrentPageId();
-
-  // Top nav (desktop)
+  const season = typeof ApiConfig !== 'undefined' ? ApiConfig.currentSeason : '';
+  const primaryIds = ['home', 'schedule', 'standings', 'boxscore'];
+  const publicIds = [...primaryIds, 'leaders', 'roster', 'dragon'];
+  const link = item => `<a href="${item.file}"${item.id === currentId ? ' class="active" aria-current="page"' : ''}>${item.label}</a>`;
   const topNav = document.getElementById('top-nav');
   if (topNav) {
-    let html = '<div class="nav-logo">🏀 大安聯盟</div><ul class="nav-links">';
-    NAV_ITEMS.forEach(item => {
-      const cls = item.id === currentId ? ' class="active"' : '';
-      html += `<li><a href="${item.file}"${cls}>${item.label}</a></li>`;
+    topNav.innerHTML = `<a class="nav-logo" href="index.html" aria-label="大安籃球聯盟首頁"><span class="site-brand-mark">DA<span>${season}</span></span><span class="site-brand-name">大安ㄍㄤㄍㄤ好<small>BASKETBALL LEAGUE</small></span></a>
+      <ul class="nav-links">${NAV_ITEMS.filter(item => primaryIds.includes(item.id)).map(item => `<li>${link(item)}</li>`).join('')}</ul>
+      <details class="site-menu"><summary aria-label="開啟全站選單">${navIcon('menu')}<span>更多</span></summary><div class="site-menu-links">${NAV_ITEMS.filter(item => publicIds.includes(item.id)).map(link).join('')}</div></details>`;
+    document.addEventListener('click', event => {
+      const menu = topNav.querySelector('.site-menu');
+      if (menu.open && !menu.contains(event.target)) menu.open = false;
     });
-    html += '</ul>';
-    topNav.innerHTML = html;
+    topNav.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        topNav.querySelector('.site-menu').open = false;
+        topNav.querySelector('summary').focus();
+      }
+    });
   }
-
-  // Bottom nav (mobile)
   const bottomNav = document.getElementById('bottom-nav');
   if (bottomNav) {
-    let html = '<div class="bottom-nav-inner">';
-    NAV_ITEMS.forEach(item => {
-      const cls = item.id === currentId ? ' class="active"' : '';
-      html += `<a href="${item.file}"${cls} data-page="${item.id}"><span class="bn-icon">${item.icon}</span>${item.label}</a>`;
-    });
-    html += '</div>';
-    bottomNav.innerHTML = html;
-
-    // 捲動到目前頁面的按鈕位置，避免重置到最左方
-    const activeBtn = bottomNav.querySelector('a.active');
-    if (activeBtn) {
-      requestAnimationFrame(() => {
-        activeBtn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' });
-      });
-    }
+    bottomNav.innerHTML = `<div class="bottom-nav-inner">${NAV_ITEMS.filter(item => primaryIds.includes(item.id)).map(item => `<a href="${item.file}"${item.id === currentId ? ' class="active" aria-current="page"' : ''} data-page="${item.id}"><span class="bn-icon">${navIcon(item.icon)}</span>${item.label}</a>`).join('')}</div>`;
+  }
+  if (!document.querySelector('.site-footer')) {
+    const footer = document.createElement('footer');
+    footer.className = 'site-footer';
+    footer.innerHTML = '<a href="index.html" class="site-footer-brand">大安ㄍㄤㄍㄤ好<small>BASKETBALL LEAGUE</small></a><p>每個星期六，一起上場。</p><a href="roster.html">認識球員 ↗</a>';
+    document.body.append(footer);
   }
 }
 
@@ -429,6 +435,21 @@ function buildMatchupCard(m) {
       </div>
       ${scoreHtml}
     </div>`;
+}
+
+function getScheduleWeekIndex(allWeeks, currentWeek) {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  let latest = -1;
+  allWeeks.forEach((entry, i) => {
+    const parts = (entry.date || '').replace(/\s/g, '').match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+    if (parts && today > new Date(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3]))) latest = i;
+  });
+  if (latest >= 0) {
+    const next = allWeeks.findIndex((entry, i) => i > latest && entry.type === 'game');
+    return next >= 0 ? next : latest;
+  }
+  return Math.max(0, allWeeks.findIndex(entry => entry.type === 'game' && entry.week === currentWeek));
 }
 
 /* ── Init on DOM ready ── */
